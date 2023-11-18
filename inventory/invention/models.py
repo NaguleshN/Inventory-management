@@ -9,6 +9,9 @@ class Product(models.Model):
     actual_count=models.PositiveIntegerField()
     available_count=models.PositiveIntegerField()
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
  
 class Category(models.Model):
     name=models.CharField(max_length=25)
@@ -17,15 +20,24 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = 'Categories'
+
+    def __str__(self):
+        return self.name
     
+
 class Logs(models.Model):
     roll_number=models.CharField(max_length=8)
     name=models.CharField(max_length=25)
     time_logged=models.DateTimeField()
+    status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     no_of_checks=models.PositiveIntegerField()
+    created_by = models.OneToOneField(User, on_delete= models.CASCADE)
 
     class Meta:
         verbose_name_plural = 'Log'
+
+    def __str__(self):
+        return self.roll_number
     
     
 class Cart(models.Model):
@@ -34,9 +46,15 @@ class Cart(models.Model):
     quantity=models.PositiveIntegerField()
     due_date=models.DateTimeField()
 
+    def __str__(self):
+        return self.Roll_number
+
 
 class Wastage(models.Model):
     roll_number=models.CharField(max_length=8)
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField()
     reason=models.TextField()
+
+    def __str__(self):
+        return self.roll_number 
