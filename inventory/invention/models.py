@@ -8,7 +8,7 @@ class Product(models.Model):
     decription=models.CharField(max_length=100)
     actual_count=models.PositiveIntegerField()
     available_count=models.PositiveIntegerField()
-    # category=
+    category= models.ForeignKey('Category', on_delete=models.CASCADE)
  
 class Category(models.Model):
     name=models.CharField(max_length=25)
@@ -22,7 +22,6 @@ class Logs(models.Model):
     roll_number=models.CharField(max_length=8)
     name=models.CharField(max_length=25)
     time_logged=models.DateTimeField()
-    # status=model
     no_of_checks=models.PositiveIntegerField()
 
     class Meta:
