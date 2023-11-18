@@ -24,13 +24,13 @@ class Logs(models.Model):
     
 class Cart(models.Model):
     Roll_number=models.CharField(max_length=8)
-    product_name=models.ForeignKey("Product.Model", on_delete=models.CASCADE)
+    # product_name=models.ForeignKey("Product.Model", on_delete=models.CASCADE)(max_length=20)
     quantity=models.PositiveIntegerField()
     due_date=models.DateTimeField()
 
 
 class Wastage(models.Model):
     roll_number=models.CharField(max_length=8)
-    product_name=models.ForeignKey("product.Model", on_delete=models.CASCADE)(max_length=20)
+    # product_name=models.ForeignKey("Product.Model", on_delete=models.CASCADE)(max_length=20)
     quantity=models.PositiveIntegerField()
     reason=models.TextField()
