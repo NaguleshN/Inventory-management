@@ -31,7 +31,6 @@ class Logs(models.Model):
     time_logged=models.DateTimeField()
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     no_of_checks=models.PositiveIntegerField()
-    created_by = models.OneToOneField(User, on_delete= models.CASCADE)
     
 
     class Meta:
