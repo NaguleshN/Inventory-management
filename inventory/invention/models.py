@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Product(models.Model):
-    name=models.CharField(max_length=10)
+    name=models.CharField(max_length=255)
     decription=models.CharField(max_length=100)
     actual_count=models.PositiveIntegerField()
     available_count=models.PositiveIntegerField()
@@ -15,7 +15,7 @@ class Product(models.Model):
  
 class Category(models.Model):
     name=models.CharField(max_length=25)
-    created_by = models.OneToOneField(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at=models.DateTimeField()
 
     class Meta:
@@ -41,6 +41,7 @@ class Logs(models.Model):
     
     
 class Cart(models.Model):
+    
     Roll_number=models.CharField(max_length=8)
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField()
