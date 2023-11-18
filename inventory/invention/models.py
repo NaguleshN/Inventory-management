@@ -18,11 +18,12 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = 'Categories'
     
+status=(('checked_in','checked_in'),('checked_out','checked_out'))
 class Logs(models.Model):
     roll_number=models.CharField(max_length=8)
     name=models.CharField(max_length=25)
     time_logged=models.DateTimeField()
-    # status=model
+    status=models.TextChoices(choice=status)
     no_of_checks=models.PositiveIntegerField()
 
     class Meta:
