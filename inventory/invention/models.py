@@ -41,7 +41,6 @@ class Logs(models.Model):
     
     
 class Cart(models.Model):
-    
     Roll_number=models.CharField(max_length=8)
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField()
