@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block base%}
+
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Logs Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+    #ist{
+        background-color:white;
+        min-height:5vh;
+    }
+    .row{
+        position:relative;
+        top:100px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background-image: linear-gradient(43deg, #cbe1e9 0%, #abc9de 46%, #278aa5 100%);
+    }
+    h2{
+        font-style:Serif;
+        font-weight:bold;
+        font-family:Serif;
+        font-size: xx-large;
+    }
+    .credit{
+        position:relative;
+        top:180px;
+    text-align: center;
+    color: #000;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight:bold;
+  }
+  
+  .credit a{
+    text-decoration: none;
+    color:#000;
+    font-weight: bold;
+  } 
+
+    </style>
+  </head>
+  <body>
+  <div class="container-fluid" id="ist">
+<section class="ftco-section">
+<div class="container">
+<div class=" row justify-content-center">
+<div class="col-md-6 text-center mb-5">
+<br>
+<br>
+<h2 class="heading-section backround-white">Logs</h2>
+</div>
+</div>
+<div class="row">
+<div class="col-md-12">
+<div class="table-wrap">
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Roll No.</th>
+<th>Name</th>
+<th>Time</th>
+<th>Number of Checks</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-success">Progress</a></td>
+</tr>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-warning">Open</a></td>
+</tr>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-danger">On hold</a></td>
+</tr>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-success">Progress</a></td>
+</tr>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-danger">On hold</a></td>
+</tr>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-warning">Open</a></td>
+</tr><tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-warning">Open</a></td>
+</tr>
+<tr>
+<th scope="row">1001</th>
+<td>Mark Otto</td>
+<td>Japan</td>
+<td>$3000</td>
+
+<td><a href="#" class="btn btn-success">Progress</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+</section>
+{% comment %} <div class="credit">Made with <span style="color:tomato">❤</span> by <a href="https://www.iqubekct.ac.in/">iQube</a></div> {% endcomment %}
+
+</div>
+
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+</html>
+
+{% endblock %}

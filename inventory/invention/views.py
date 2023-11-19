@@ -18,7 +18,11 @@ def home(request):
 def about(request):
 	return render(request, 'about.html')
  
+def logs(request):
+	return render(request, 'logs.html')
 
+def cart(request):
+	return render(request, 'cart.html')
 
 #Product Details
 def add_product(request):
