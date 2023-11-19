@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -148,13 +149,13 @@ section{
       <label for="check" class="checkbtn">
         <i class="fas fa-bars"></i>
       </label>
-      <label class="logo">iQube</label>
-      <ul>
-        <li><a class="active" href="#">Home</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Logs</a></li>
-        <li><a href="#">Products</a></li>
-        <li><a href="#">Wastage</a></li>
+      <img src="{% static 'images/logo-white.png' %}" alt="images/logo-white.png" height="36" width="150" class="mt-4">
+      <ul class="mx-5">
+        <li><a class="active text-decoration-none" href="#">Home</a></li>
+        <li><a href="#" class="text-decoration-none">About</a></li>
+        <li><a href="#" class="text-decoration-none">Logs</a></li>
+        <li><a href="#" class="text-decoration-none">Products</a></li>
+        <li><a href="#" class="text-decoration-none">Wastage</a></li>
       </ul>
     </nav>
     </div>
