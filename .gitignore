@@ -2,9 +2,10 @@
 *.log
 *.pot
 *.pyc
-__pycache__
-media
+__pycache__/
+local_settings.py
 db.sqlite3
+media
 
 # Python # 
 *.py[cod] 
