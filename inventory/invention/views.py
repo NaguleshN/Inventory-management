@@ -42,13 +42,11 @@ def add_product(request):
 def add_category(request):
      categories = Category.objects.all()
      if request.method == "POST":
-          name = request.POST.get('name')
-          roll_no = request.POST.get('roll_no')
+         name = request.POST.get('name')
+         roll_no = request.POST.get('created_by')
 
-          Category.objects.create(name = name,
-                                  roll_no = roll_no
-                                  )
-     return render(request, 'add_category.html', {'categories': categories,})
+         Category.objects.create(name = name,created_by = roll_no)
+     return render(request, 'add_category.html', {'categories': categories})
 
 def add_wastage(request):
      return render(request, 'wastage.html')
