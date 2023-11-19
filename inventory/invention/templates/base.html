@@ -152,7 +152,7 @@ section{
       </label>
       <img src="{% static 'images/logo-white.png' %}" alt="images/logo-white.png" height="36" width="150" class="mt-4">
       <ul class="mx-5">
-        <li><a class="active text-decoration-none" href="#">Home</a></li>
+        <li><a class="active text-decoration-none" href="/">Home</a></li>
         <li><a href="{% url 'About' %}" class="text-decoration-none">About</a></li>
         <li><a href="#" class="text-decoration-none">Logs</a></li>
         <li><a href="#" class="text-decoration-none">Products</a></li>
@@ -168,10 +168,10 @@ section{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.5/sweetalert2.all.min.js"></script>
    
-<footer class="bg-light text-center text-lg-start fixed-bottom container-fluid">
+<footer class="bg-light text-center text-lg-start mt-auto container-fluid">
   <!-- Copyright -->
-  <div class="text-center p-3" style="background-color: #0ea5e9;color:white;">
-    © 2023 MADE WITH iQUBE 
+  <div class="text-center p-3 mt-auto" style="background-color: #0ea5e9;color:white;">
+    <div class="credit">Made with <span style="color:tomato">❤</span> by <a href="https://www.iqubekct.ac.in/" class="text-decoration-none text-white">iQube</a></div> 
     {% comment %} <a class="text-dark" href="https://mdbootstrap.com/">iQube</a> {% endcomment %}
   </div>
   <!-- Copyright -->
