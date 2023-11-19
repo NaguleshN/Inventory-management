@@ -10,6 +10,7 @@ class Product(models.Model):
     available_count=models.PositiveIntegerField()
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
+    image = models.ImageField(upload_to='images')
 
     def __str__(self):
         return self.name

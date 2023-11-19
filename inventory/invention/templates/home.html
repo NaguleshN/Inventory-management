@@ -24,7 +24,6 @@
                       <thead>
                         <tr>
                           <th>Product Name</th>
-                          <th>Description</th>
                           <th>Actual Quantity</th>
                           <th>Available Quantity</th>
                           <th>Category</th>
@@ -32,12 +31,12 @@
                       </thead>
                       <tbody>
                         {% for product in products %}
-                        <tr>
+                        <tr>  
                           <td>{{product.name}}</td>
-                          <td class="font-weight-bold">{{ product.decription}}</td>
                           <td>{{ product.actual_count}}</td>
                           <td>{{ product.available_count}}</td>
                           <td>{{ product.category }}</td>
+                          <td><a href="{% url 'Product_description' product.id %}" class="text-decoration-none text-black"><button class="btn btn-outline-primary">View Detail</button> </a></td>
                           <td><button class="btn btn-outline-primary">ADD</button></td>
                         </tr>
                         {% endfor %}

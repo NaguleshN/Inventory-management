@@ -1,5 +1,5 @@
 
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from .models import *
 import sweetify
 
@@ -70,5 +70,6 @@ def add_wastage(request):
     return render(request, 'wastage.html', {'category':categories,
       'products':products,})
 
-def product_description(request):
-    return render(request, 'product_description.html')
+def product_description(request, pk):
+    item = get_object_or_404(Product, pk =pk)
+    return render(request, 'product_description.html', {'item':item,})
