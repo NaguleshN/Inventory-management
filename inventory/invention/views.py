@@ -2,6 +2,7 @@
 from django.shortcuts import render,redirect
 from .models import *
 
+#User
 
 def home(request):
     products = Product.objects.all()
@@ -11,7 +12,14 @@ def home(request):
        products = products.filter(name__icontains = query)
 
     return render(request, 'home.html', {'products': products,})
+
+
+def about(request):
+	return render(request, 'about.html')
  
+
+
+#Product Details
 def add_product(request):
    category=Category.objects.all()
    if request.method=="POST":
@@ -27,3 +35,15 @@ def add_product(request):
          return redirect("Add_product")
     
    return render (request,"add_product.html",{"category":category})
+
+def add_category(request):
+     categories = Category.objects.all()
+     if request.method == "POST":
+          name = request.POST.get('name')
+          roll_no = request.POST.get('roll_no')
+
+          Category.objects.create(name = name,
+                                  roll_no = roll_no
+                                  )
+     return render(request, 'add_category.html', {'categories': categories,})
+
