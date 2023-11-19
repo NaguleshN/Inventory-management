@@ -69,3 +69,6 @@ def add_wastage(request):
                               )   
     return render(request, 'wastage.html', {'category':categories,
       'products':products,})
+
+def product_description(request):
+    return render(request, 'product_description.html')

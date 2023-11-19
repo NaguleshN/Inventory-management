@@ -144,20 +144,28 @@ section{
   </head>
   <body>
     
-  <div class="container-fluid ">
+  <div class="container-fluid fixed-top">
 <nav class="nav ">
       <input type="checkbox" id="check">
       <label for="check" class="checkbtn">
         <i class="fas fa-bars"></i>
       </label>
       <img src="{% static 'images/logo-white.png' %}" alt="images/logo-white.png" height="36" width="150" class="mt-4">
-      <ul class="mx-5">
-        <li><a class="active text-decoration-none" href="/">Home</a></li>
-        <li><a href="{% url 'About' %}" class="text-decoration-none">About</a></li>
-        <li><a href="#" class="text-decoration-none">Logs</a></li>
-        <li><a href="#" class="text-decoration-none">Products</a></li>
-        <li><a href="{% url 'Add_wastage' %}" class="text-decoration-none">Wastage</a></li>
-      </ul>
+      <div>
+          <ul >
+            <li><a class="active text-decoration-none" href="/">Home</a></li>
+            <li><a href="{% url 'About' %}" class="text-decoration-none">About</a></li>
+            <li><a href="#" class="text-decoration-none">Logs</a></li>
+            <li><a href="#" class="text-decoration-none">Products</a></li>
+            <li><a href="{% url 'Add_wastage' %}" class="text-decoration-none">Wastage</a></li>
+          </ul>
+      </div>
+
+        <div class="mt-4 cart">
+          <button class="btn btn-info text-white border-white">CART</button>
+        </div>
+
+      
     </nav>
     </div>
 <br>

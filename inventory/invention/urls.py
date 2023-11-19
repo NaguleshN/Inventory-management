@@ -14,6 +14,7 @@ urlpatterns = [
     path('add_product/', views.add_product ,name="Add_product"), 
     path('add_category/', views.add_category, name="Add_category"),
     path('add_wastage/', views.add_wastage, name="Add_wastage"),
+    path('product_description/', views.product_description, name="Product_description"),
 ]
 
 if settings.DEBUG:
