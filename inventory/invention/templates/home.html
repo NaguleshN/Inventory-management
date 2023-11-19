@@ -3,12 +3,14 @@
 {% block base %}
 {% comment %} search bar {% endcomment %}
  <div class="container  p-4 shadow-lg my-3">
+  <form action="{% url 'Home' %}" method="get">
 <div class="input-group">
-	<input type="text" name="query" value="query" class="form-control" placeholder="Search for...">
+	<input type="text" name="query" value="{{query}}" class="form-control" placeholder="Search for...">
       <span class="input-group-btn">
         <button class="btn btn-search" type="button"><i class="fa fa-search fa-fw"></i> Search</button>
       </span>
 </div>
+</form>
 </div> 
 
 
