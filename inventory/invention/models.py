@@ -53,9 +53,11 @@ class Cart(models.Model):
 
 class Wastage(models.Model):
     roll_number=models.CharField(max_length=8)
-    product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_name=models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField()
     reason=models.TextField()
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.roll_number 
