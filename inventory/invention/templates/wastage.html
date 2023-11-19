@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block base %}
+<body class="p-4">
+  
+<div class="container shadow p-4 mb-5">
+    <div class="row justify-content-between gap-4">
+
+      <div class="col bg-cyan rounded">
+        <form method="POST">
+          {% csrf_token%}
+          
+          <center><h1 style="font-style:Serif">Wastage Form</h1></center>
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Product Name</label>
+            <input type="text" class="form-control" id="exampleInputEmail1"name="name">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Description</label>
+            <input type="text" class="form-control" id="exampleInputPassword1" name="description">
+          </div>
+          
+          <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Actual Quantity</label>
+              <input type="number" class="form-control" id="exampleInputEmail1" name="actual">
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Available Quantity</label>
+              <input type="number" class="form-control" id="exampleInputEmail1"  name="avail">
+            </div>
+            <div class="mb-3">
+              <label for="select" class="form-label">Category</label>
+              <select  class="form-select" id="select" name="category"> 
+                  {% for i in category%}
+                  <option value="{{i.name}}">{{i.name}}</option>
+                  {% endfor %}
+              </select>
+            </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+
+      <div class="col rounded mt-5 p-5 mx-5">
+        <img src="{% static 'images/download.png' %}" alt="loading" height="300">
+      </div>
+
+    </div>
+</div>
+
+</body>
+{% endblock %}

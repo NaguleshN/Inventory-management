@@ -50,3 +50,5 @@ def add_category(request):
                                   )
      return render(request, 'add_category.html', {'categories': categories,})
 
+def add_wastage(request):
+     return render(request, 'wastage.html')
