@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     #own
     'invention',
+    'sweetify'
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,5 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR,'invention/static'),]
 MEDIA_URL = 'media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'

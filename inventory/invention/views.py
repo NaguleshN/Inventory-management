@@ -1,6 +1,7 @@
 
 from django.shortcuts import render,redirect
 from .models import *
+import sweetify
 
 #User
 
@@ -32,6 +33,8 @@ def add_product(request):
          category=Category.objects.get(name=cat)
          Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category)
          # return render (request,"add_product.html",{"category":category})
+         print("exec add product")
+         sweetify.success(request, 'Product added successfully',button="OK")
          return redirect("Add_product")
     
    return render (request,"add_product.html",{"category":category})

@@ -9,6 +9,7 @@ class Product(models.Model):
     actual_count=models.PositiveIntegerField()
     available_count=models.PositiveIntegerField()
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -16,7 +17,7 @@ class Product(models.Model):
 class Category(models.Model):
     name=models.CharField(max_length=25)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at=models.DateTimeField()
+    created_at=models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -28,7 +29,7 @@ class Category(models.Model):
 class Logs(models.Model):
     roll_number=models.CharField(max_length=8)
     name=models.CharField(max_length=25)
-    time_logged=models.DateTimeField()
+    time_logged=models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     no_of_checks=models.PositiveIntegerField()
     
