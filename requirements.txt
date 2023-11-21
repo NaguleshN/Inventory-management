@@ -6,3 +6,6 @@ sqlparse==0.4.4
 sweetify==2.3.1
 tzdata==2023.3
 Pillow==10.0.0
+django-microsoft-auth==3.0.1
+social-auth-app-django==5.4.0
+# social-auth-core==4.5.0
