@@ -1,22 +1,76 @@
-
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from .models import *
 import sweetify
-
+from django.contrib.auth.models import User,auth
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+from django.contrib import messages
+from django.views.generic import View
 #User
 
 def home(request):
     products = Product.objects.all()
+    cart_items = CartItem.objects.all()
     query = request.GET.get('query', '')
 
+    cart_qty = {item.product_id:item.quantity for item in cart_items}
     if query:
        products = products.filter(name__icontains = query)
+
+    for product in products :
+      if product.id in cart_qty:
+        product.quantity -= cart_qty[product.id]
 
     return render(request, 'home.html', {'products': products,})
 
 
 def about(request):
 	return render(request, 'about.html')
+
+def cart(request):
+	return render(request, 'cart.html')
+
+def login_page(request):
+    if request.method=='POST':
+        rollno=request.POST.get('rollno')
+        password="iqube@kct"
+        hashed_password = make_password(password)
+        user=auth.authenticate(username=rollno,password=password)
+        auth.login(request,user)
+        if user != None:
+            return redirect('cart:Home')
+        else:
+            return redirect('cart:Register')
+        
+    else:
+      return render(request,'login.html')
+
+def register(request):
+     details=User.objects.all()
+    #  print(u)
+     
+     if request.method == "POST":
+                    print('Van')
+                    rollno = request.POST.get('rollno')
+                    print('lorry')
+                    password='iqube@kct'
+                    print('3d printer')
+                    hashed_password = make_password(password)
+                    data = User.objects.create_user(username=rollno,password=password)
+                    data.save()
+                    print('hi')
+                    for i in details:
+                        if i.username==rollno:
+                            # print("hello")
+                            return redirect("cart:Login")
+                    
+
+                    print('4d')
+                    return redirect('cart:Login')
+
+     return render(request, 'register.html')
+
+
  
 
 
@@ -69,3 +123,100 @@ def add_wastage(request):
                               )   
     return render(request, 'wastage.html', {'category':categories,
       'products':products,})
+
+def view_cart(request, item_id):
+
+    print(item_id)
+    cart_items = CartItem.objects.filter(user=request.user)
+    print(cart_items)
+    for i in cart_items:
+      print(i)
+      print(i.id)
+      # for i in :
+      #   print(i.id)
+    me=CartItem.objects.filter(id=item_id)
+    print(me)
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
+
+    if request.method=="POST":
+      print("method")
+      for i in cart_items:
+          products = Product.objects.all()
+          print("sahduhf")
+          cart_item, created = PurchasedItems.objects.get_or_create(product=i.product, 
+                                                       user=request.user)
+          print("print")
+          cart_item.quantity =i.quantity
+          cart_item.save()
+          print("save")
+ 
+    return render(request, 'cart.html',{'cart_items': cart_items, 'total_price': total_price})
+
+
+
+# def view_cart(request, item_id):
+    
+#     cart_items = CartItem.objects.filter(user=request.user)
+#     print(cart_items)
+
+#     total_price = sum(item.product.price * item.quantity for item in cart_items)
+
+#     if request.method == "POST":
+#       print("hii")
+#       for i in cart_items:
+#         print("hello")
+#         if i.user==request.user:
+#           print("jfidsjf")
+#           products = Product.objects.get(id = product_id)
+#           print("sahduhf")
+#           cart_item, created = PurchasedItems.objects.get_or_create(product=product, 
+                                                      #  user=request.user)
+    #       print("print")
+    #       cart_item.quantity =i.quantity
+    #       cart_item.save()
+    #       print("save")
+          
+ 
+    # return render(request, 'cart.html',{'cart_items': cart_items, 'total_price': total_price})
+
+# class cart_view(View):
+#   def get(self, request, product_id, *args, **Kwargs):
+#     cart_items = CartItem.objects.filter(user=request.user)
+#     return render(request, 'cart.html', {'cart_items':cart_items,})
+
+#   def post(self, request, item_id, *args, **Kwargs):
+#     cart_items = CartItem.objects.filter(user=request.user)
+
+#     total_price = sum(item.product.price * item.quantity for item in cart_items)
+#     if request.method == "POST":
+#       for i in cart_items:
+
+#         if i.user==request.user:
+
+#           cart = CartItem.objects.get(id = item_id)
+
+#           cart_item, created = PurchasedItems.objects.get_or_create(cart=cart, 
+#                                                        user=request.user)
+#           cart_item.quantity =i.quantity
+#           cart_item.save()
+
+ 
+def add_to_cart(request, product_id):
+    product = Product.objects.get(id=product_id)
+    cart_item, created = CartItem.objects.get_or_create(product=product, 
+                                                       user=request.user)
+    cart_item.quantity += 1
+    cart_item.save()
+    
+
+    return redirect('cart:Home')
+
+    
+ 
+def remove_from_cart(request, item_id):
+    cart_item = CartItem.objects.get(id=item_id)
+    cart_item.delete()
+    return redirect('cart:Home')
+ 
+
+

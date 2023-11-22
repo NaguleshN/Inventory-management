@@ -127,7 +127,12 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STATIC_URL = 'static/'
+# Static files (CSS, JavaScript, images)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
+# Media files (uploaded user files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'invention/static'),]
 
@@ -136,3 +141,4 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
+

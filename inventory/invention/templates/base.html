@@ -138,6 +138,13 @@ section{
   background:blue;
 }
 
+.cart a {
+  text-decoration: none;
+  color: white;
+  position: absolute;
+  top: 4%;
+  left: 90%;
+}
 
 
     </style>
@@ -153,12 +160,17 @@ section{
       <img src="{% static 'images/logo-white.png' %}" alt="images/logo-white.png" height="36" width="150" class="mt-4">
       <ul class="mx-5">
         <li><a class="active text-decoration-none" href="#">Home</a></li>
-        <li><a href="{% url 'About' %}" class="text-decoration-none">About</a></li>
+        <li><a href="#" class="text-decoration-none">About</a></li>
         <li><a href="#" class="text-decoration-none">Logs</a></li>
         <li><a href="#" class="text-decoration-none">Products</a></li>
-        <li><a href="{% url 'Add_wastage' %}" class="text-decoration-none">Wastage</a></li>
+        <li><a href="#" class="text-decoration-none">Wastage</a></li>
       </ul>
     </nav>
+    </div>
+    <div class="cart">
+      {% for product in products %}
+      <a href="{% url 'cart:view_cart' product.id %}">CART</a>
+      {% endfor %}
     </div>
 <br>
 
