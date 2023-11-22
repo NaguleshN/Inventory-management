@@ -4,6 +4,7 @@ from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('', views.home ,name="Home"), 
@@ -15,6 +16,7 @@ urlpatterns = [
     path('add_category/', views.add_category, name="Add_category"),
     path('add_wastage/', views.add_wastage, name="Add_wastage"),
     path('logs/', views.logs, name="logs"),
+    path('logout/', LogoutView.as_view() , name="logout"),
     path('cart/', views.cart, name="cart"),
     path('product_description/<int:pk>', views.product_description, name="Product_description"),
 
