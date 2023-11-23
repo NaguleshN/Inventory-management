@@ -6,6 +6,7 @@
 <style>
 #waste{
   margin-top:75px;
+  
 }
 
 </style>
@@ -14,7 +15,7 @@
 <div class="p-4 " id="waste">
   
 <div class="container shadow p-4 mb-4">
-    <div class="row justify-content-between gap-4">
+    <div class="row justify-content-between gap-4 " style="margin-left:95px;padding:35px">
 
       <div class="col bg-cyan rounded">
         <form method="POST">
@@ -24,6 +25,7 @@
           <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Product Name</label>
             <select  class="form-select" id="select" name="product_name"> 
+            <option selected disabled>--CHOOSE--</option>
               {% for product in products%}
               <option value="{{product.name}}">{{product.name}}</option>
               {% endfor %}
@@ -31,7 +33,7 @@
           </div>
           <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Roll_Number</label>
-            <input type="text" class="form-control" id="exampleInputPassword1" name="roll_number">
+            <input type="text" class="form-control" id="exampleInputPassword1" name="roll_number" value={{request.user}} readonly>
           </div>
           
           <div class="mb-3">

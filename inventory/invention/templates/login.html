@@ -1,0 +1,136 @@
+{% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+        
+        <script src="proj.js"></script>
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+                box-sizing:border-box;
+                font-family:Arial, Helvetica, sans-serif;
+            
+            }
+             body {
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                background-color: white;
+               
+             }
+            
+            .forms {
+                width: 420px;
+                background-color: transparent;
+                color:black
+            
+            }
+            .forms h1{
+                text-align: center;
+                font: size 50px;;
+            }
+            .forms .inputbox {
+                position:relative;
+                width:100%;
+                height:50px;
+                padding:20px;
+                
+                margin:30px 0;
+            
+            }
+            .inputbox input {
+                width:100%;
+                height:100%;
+                background:transparent;
+                border:none;
+                border:2px solid black;
+                border-radius: 40px;
+                padding:20px 20px 20px 20px;
+                font-size: 17px;
+            
+            
+            
+            }
+            .inputbox input::placeholder{
+                color:black
+            }
+            .inputbox i {
+
+                position:absolute;
+                font-size: 50px;
+                
+            }
+            .forms .forgot {
+                justify-content: space-between;
+                margin:-15px 0px 15px;
+                padding:20px
+            }
+            .inputbox input:focus{
+                color: black;
+            }
+            .forgot .submit{
+                width:100%;
+                height:40px;
+                background-color:cyan;
+            }
+            .forgot .submit:hover{
+                background-color:white;
+            }
+            .forgot a{
+                align-items:center;
+            }
+            .borderbox{
+                border:2px solid white;
+                box-shadow: 10px 10px 10px 10px;
+                border-radius:20px;
+                padding:100px;
+            }
+            .message {
+              color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="image">
+       
+            <img src="{% static '\images\10yearslogo_1-1-1_page-0001-removebg-preview.png' %}" alt="">
+         </div>
+        <div class="borderbox">
+           
+        <div class="forms">
+           
+        <form method="POST">
+          {% csrf_token %}
+          
+            <h1>Login</h1>
+            <div class="inputbox">
+                <input name='rollno' type="text" placeholder="Enter your rollnumber" >
+                {{password}}
+                <i class='bx bxs-user'></i>
+
+            </div>
+            
+            <div class="forgot">
+               
+                <button type="submit" class="submit">LOGIN</button>
+            </div>
+
+            ADMIN:
+            <a href="{% url "social:begin" 'azuread-tenant-oauth2' %}">MICROSOFT </a>
+            
+            <div class="message">
+              {% for message in messages %}
+              <p> {{message}} </p>  
+              {% endfor %}
+            </div>
+            
+        </form>
+         </div>
+        
+        </div>
+    </body>
+</html>

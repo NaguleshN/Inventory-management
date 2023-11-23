@@ -24,7 +24,7 @@
           <div class="card-body">
             <h5 class="card-title">{{item.name}}</h5>
             <p class="card-text">{{item.decription}}</p>
-            <p class="row justify-content-center "><Button>Add to Cart</Button></p>
+            <p class="row justify-content-center "><a href="{% url 'add_to_cart' item.id %}"><Button>Add to Cart</Button></a></p>
           </div>
         </div>
       </div>

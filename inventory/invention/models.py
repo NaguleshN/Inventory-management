@@ -43,13 +43,14 @@ class Logs(models.Model):
     
     
 class Cart(models.Model):
-    Roll_number=models.CharField(max_length=8)
+    # Roll_number=models.CharField(max_length=8)
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity=models.PositiveIntegerField()
-    due_date=models.DateTimeField()
+    quantity=models.PositiveIntegerField(default=0)
+    due_date=models.DateTimeField(auto_now=True)
+    created_by=models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.Roll_number
+        return self.product_name
 
 
 class Wastage(models.Model):
@@ -62,3 +63,21 @@ class Wastage(models.Model):
 
     def __str__(self):
         return self.roll_number 
+
+class PurchasedItems(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_added = models.DateTimeField(auto_now_add=True) 
+    def _str_(self):
+        return str(self.product)
+    
+class Log(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
+
+    def _str_(self):
+        return str(self.product)

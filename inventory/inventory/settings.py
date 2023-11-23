@@ -54,10 +54,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    # 'social_django.middleware.SocialAuthExceptionMiddleware',
-    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',    
 ]
 
 ROOT_URLCONF = 'inventory.urls'
@@ -108,6 +105,7 @@ SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_SECRET = 'Xgt8Q~pCb80xxl-SQiIOyWHp2p0XpT_rfdSV
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_TENANT_ID = '6b8b8296-bdff-4ad8-93ad-84bcbf3842f5'
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
+
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
@@ -120,7 +118,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-LOGIN_REDIRECT_URL="/"
+LOGIN_REDIRECT_URL="home/"
 LOGOUT_REDIRECT_URL="/"
 # SOCIAL_AUTH_POSTGRES_JSONFIELD = True  # Before
 # SOCIAL_AUTH_JSONFIELD_ENABLED = True  # After

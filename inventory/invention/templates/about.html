@@ -1,234 +1,175 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
+{% block base %}
 
-{% block base%}
+ {% comment %} <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script> {% endcomment %}
+<!------ Include the above in your HEAD tag ---------->
+<script>
+body {
+    font-family: 'Roboto';font-size: 16px;
+}
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>About Us card || Learning robo</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        {% comment %} <link rel="stylesheet" href="style.css"> {% endcomment %}
-        <script src="https://kit.fontawesome.com/dbed6b6114.js" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        <style>
-        
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
-
-*{
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+.aboutus-section {
+    padding: 90px 0;
 }
-body{
-    font-family: 'Playfair Display', serif;
-    display: grid;
-    {% comment %} background-color: #4158D0;
-background-image: linear-gradient(43deg, #c0d6de 0%, #abc9de 46%, #40b7d7 100%); {% endcomment %}
-{% comment %} background-image: linear-gradient(43deg, #c6d9ed 0%, #eeffff 46%, #eceff1 100%); --> {% endcomment %}
-
-    align-content: center;
-    min-height: 100vh;
-    margin-top:45px;
-    {% comment %} margin-bottom:55px; {% endcomment %}
-}
-section{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 70vh;
-    width: 75vw;
-    margin: 0 auto;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    border-radius: 12px
-}
-.image{
-    background-color: #12192c;
-    display: flex;
-    border-radius: 12px 0 0 12px;
-}
-.image img{
-    
-position:relative;
-top:230px;
-left:20px;    
-height:15vh;
-width:70%;
-margin:15px auto
-}
-.content{
-    background-color: #12192c;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 0  12px 12px 0;
-    color: #fff;
-}
-.content h2{
+.aboutus-title {
+    font-size: 30px;
+    letter-spacing: 0;
+    line-height: 32px;
+    margin: 0 0 39px;
+    padding: 0 0 11px;
+    position: relative;
     text-transform: uppercase;
-    font-size: 36px;
-    letter-spacing: 6px;
-    opacity: 0.9;
-}
-.content span{
-    height: 0.5px;
-    width: 80px;
-    background: #777;
-    margin: 30px 0;
-}
-.content p{
-    padding-bottom: 15px;
-    font-weight: 300;
-    opacity: 0.7;
-    width: 60%;
-    text-align: center;
-    margin: 0 auto;
-    line-height: 1.7;
-    color:#ffffff
-}
-.links{
-    margin: 15px 0;
-}
-.links li{
-    border: 2px solid #4158D0;
-    list-style: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    width: 160px;
-    text-align: center;
-}
-.links li a{
-    text-transform: uppercase;
-    color: #fff;
-    text-decoration: none;
-}
-.links li:hover{
-    border-color: #C850C0;
-}
-
-.vertical-line{
-    height: 30px;
-    width: 3px;
-    background: #C850C0;
-    margin: 0 auto;
-}
-.icons{
-    display: flex;
-    padding: 15px 0;
-}
-.icons li{
-    display: block;
-    padding: 5px;
-    margin: 5px;
-}
-.icons li i{
-    font-size: 26px;
-    opacity: 0.8;
-}
-.icons li i:hover{
-    color: #C850C0;
-    cursor: pointer;
-}
-#dim{
-    height:50%;
-}
-
-
-/*****************/
-
-@media(max-width: 900px){
-    section{
-        grid-template-columns: 1fr;
-        width: 100%;
-        border-radius: none;
-    }
-    .image{
-        height: 100vh;
-        border-radius: none;
-    }
-    .content{
-        height: 100vh;
-        border-radius: none;
-    }
-    .content h2{
-        font-size: 20px;
-        margin-top: 50px;
-    }
-    .content span{
-        margin: 20px 0;
-    }
-    .content p{
-        font-size: 14px;
-    }
-    .links li a{
-        font-size: 14px;
-    }
-    .links{
-        margin: 5px 0;
-    }
-    .links li{
-        padding: 6px 10px;
-    }
-    .icons li i{
-        font-size: 15px;
-    }
-}
-.credit{
-    text-align: center;
     color: #000;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  }
-  
-  .credit a{
+}
+.aboutus-title::after {
+    background: #fdb801 none repeat scroll 0 0;
+    bottom: 0;
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    width: 54px;
+}
+.aboutus-text {
+    color: #606060;
+    font-size: 13px;
+    line-height: 22px;
+    margin: 0 0 35px;
+}
+
+a:hover, a:active {
+    color: #ffb901;
     text-decoration: none;
-    color:#000;
-    font-weight: bold;
-  } 
+    outline: 0;
+}
+.aboutus-more {
+    border: 1px solid #fdb801;
+    border-radius: 25px;
+    color: #fdb801;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+    padding: 7px 20px;
+    text-transform: uppercase;
+}
+.feature .feature-box .iconset {
+    background: #fff none repeat scroll 0 0;
+    float: left;
+    position: relative;
+    width: 18%;
+}
+.feature .feature-box .iconset::after {
+    background: #fdb801 none repeat scroll 0 0;
+    content: "";
+    height: 150%;
+    left: 43%;
+    position: absolute;
+    top: 100%;
+    width: 1px;
+}
+
+.feature .feature-box .feature-content h4 {
+    color: #0f0f0f;
+    font-size: 18px;
+    letter-spacing: 0;
+    line-height: 22px;
+    margin: 0 0 5px;
+}
 
 
-        </style>
-    </head>
-    <body>
-        <section id="dim">
-            <div class = "image img ">
-            <img src="https://iqubekct.ac.in/static/assets/images/logo-white.png" >
+.feature .feature-box .feature-content {
+    float: left;
+    padding-left: 28px;
+    width: 78%;
+}
+.feature .feature-box .feature-content h4 {
+    color: #0f0f0f;
+    font-size: 18px;
+    letter-spacing: 0;
+    line-height: 22px;
+    margin: 0 0 5px;
+}
+.feature .feature-box .feature-content p {
+    color: #606060;
+    font-size: 13px;
+    line-height: 22px;
+}
+.icon {
+    color : #f4b841;
+    padding:0px;
+    font-size:40px;
+    border: 1px solid #fdb801;
+    border-radius: 100px;
+    color: #fdb801;
+    font-size: 28px;
+    height: 70px;
+    line-height: 70px;
+    text-align: center;
+    width: 70px;
+}
+
+</script>
+{% comment %} <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'> {% endcomment %}
+<div class="container  ">
+<div class="aboutus-section mt-5 ">
+        <div class="container ">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="aboutus">
+                        <h2 class="aboutus-title">About Us</h2>
+                        <p class="aboutus-text">Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in.</p>
+                        <p class="aboutus-text">This is Photoshop's version of Lorem Ipsum. Proin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem</p>
+                        <a class="aboutus-more" href="#">read more</a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="aboutus-banner">
+                        <img src="http://themeinnovation.com/demo2/html/build-up/img/home1/about1.jpg" alt="">
+                    </div>
+                </div>
+                <div class="col-md-5 col-sm-6 col-xs-12">
+                    <div class="feature">
+                        <div class="feature-box">
+                            <div class="clearfix ">
+                                <div class="iconset">
+                                    <span class="glyphicon glyphicon-cog icon"></span>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Work with heart</h4>
+                                    <p>Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-box">
+                            <div class="clearfix">
+                                <div class="iconset">
+                                    <span class="glyphicon glyphicon-cog icon"></span>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Reliable services</h4>
+                                    <p>Donec vitae sapien ut libero venenatis faucibu. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-box">
+                            <div class="clearfix">
+                                <div class="iconset">
+                                    <span class="glyphicon glyphicon-cog icon"></span>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Great support</h4>
+                                    <p>Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class = "content">
-            <br>
-            <br>
-                <h2>About Us</h2>
-                <span><!-- line here --></span>
-                <p> iQube, A dynamic learning environment dedicated to shaping the the next generation of tech professionals. </p>
-                About the App
-                <p>The inventory management System tracks and manages the components inside iQube. It has functionalities for product management, stock tracking,components taken out and returned back. </p>
-                <ul class = "links">
-                    <li><a href = "{% url 'Home' %}">Home</a></li>
-                    <div class = "vertical-line"></div>
-                    <li><a href = "{% url 'About' %}">service</a></li>
-                    <div class = "vertical-line"></div>
-                    <li><a href = "#">contact</a></li>
-                </ul>
-                <ul class = "icons">
-                    <li>
-                        <i class = "fa fa-twitter"></i>
-                    </li>
-                    <li>
-                        <i class = "fa fa-facebook"></i>
-                    </li>
-                    <li>
-                        <i class = "fa fa-github"></i>
-                    </li>
-                    <li>
-                        <i class = "fa fa-pinterest"></i>
-                    </li>
-                </ul>
-            </div>
-        </section>
-        <div class="mb-5">
         </div>
-        {% comment %} <div class="credit">Made with <span style="color:tomato">❤</span> by <a href="https://www.iqubekct.ac.in/">iQube</a></div> {% endcomment %}
-    </body>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>    
-
-
-{% endblock %}
+    </div>
+    </div>
+ 
+    {% endblock %}

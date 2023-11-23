@@ -44,8 +44,14 @@
                           <td>{{ product.actual_count}}</td>
                           <td>{{ product.available_count}}</td>
                           <td>{{ product.category }}</td>
-                          <td><a href="{% url 'Product_description' product.id %}" class="text-decoration-none text-black"><button class="btn btn-outline-primary">View Detail</button> </a></td>
-                          <td><button class="btn btn-outline-primary">ADD</button></td>
+                          <td>
+                          <a href="{% url 'Product_description' product.id %}" class="text-decoration-none text-black"><button class="btn btn-outline-primary">View Detail</button> </a></td>
+                          <td>
+                          <form action="{% url 'add_to_cart' product.id %}">
+                          {% csrf_token%}
+                          <button class="btn btn-outline-primary">ADD</button>
+                          </form>
+                          </td>
                         </tr>
                         {% endfor %}
                       </tbody>
