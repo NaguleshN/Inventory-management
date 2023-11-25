@@ -50,7 +50,7 @@ class Cart(models.Model):
     created_by=models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.product_name
+        return str(self.product_name)
 
 
 class Wastage(models.Model):
