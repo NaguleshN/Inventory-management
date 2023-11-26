@@ -105,6 +105,8 @@ def product_description(request, pk):
     return render(request, 'product_description.html', {'item':item,})
 
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('Home')
     if request.method=='POST':
         rollno=request.POST.get('rollno')
 
