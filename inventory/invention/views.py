@@ -59,7 +59,7 @@ def add_product(request):
          decription=request.POST.get("description")
          actual_count=request.POST.get("actual")
          available_count=request.POST.get("avail")
-         img=request.POST.get("image")   
+         img=request.FILES["image"]   
          cat=request.POST.get("category")
          category=Category.objects.get(name=cat)
          Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img)
@@ -101,7 +101,8 @@ def add_wastage(request):
       'products':products,})
 @login_required
 def product_description(request, pk):
-    item = get_object_or_404(Product, pk =pk)
+    # item = get_object_or_404(Product, pk =pk)
+    item = Product.objects.get( pk =pk)
     return render(request, 'product_description.html', {'item':item,})
 
 def login(request):
@@ -124,7 +125,7 @@ def login(request):
                    
         else:
             messages.warning(request, 'You have to look up the Roll Number.')
-            return render(request, 'loginn.html')  
+            return render(request, 'login.html')  
 
     return render(request,'login.html')
 

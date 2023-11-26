@@ -28,7 +28,7 @@
                 <img src="{% static 'images\10yearslogo_1-1-1_page-0001-removebg-preview.png' %}" alt="" weight>
                </div>
           <div class="col p-4 d-flex flex-column position-static" >
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data" >
                 {% csrf_token%}
                 
                 <center><h1 style="font-style:Serif">PRODUCT FORM</h1></center>
@@ -52,6 +52,7 @@
                   <div class="mb-3">
                     <label for="select" class="form-label">Category</label>
                     <select  class="form-select" id="select" name="category"> 
+                        <option selected disabled>--SELECT--</option>
                         {% for i in category%}
                         <option value="{{i.name}}">{{i.name}}</option>
                         {% endfor %}
