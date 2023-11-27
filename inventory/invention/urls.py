@@ -25,6 +25,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view() , name="logout"),
     # path('cart/', views.cart, name="cart"),
     path('product_description/<int:pk>', views.product_description, name="Product_description"),
+    path('admin_views/', views.admin_view, name='admin'),
 
 ]
 

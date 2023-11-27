@@ -121,18 +121,18 @@ border-bottom-right-radius: 16px;
                   <tbody>
                     {% for item in cart_items %}
                     <tr>
-                      <td><img src="{% static 'item.product_name.image.url'  %}" alt="item.image.url"></td>
+                      <td><img src="{{MEDIA_URL}}{{item.product_name.image.url}}"  ></td>
                       <td>{{ item.product_name.name }}</td>
                       <td>{{ item.quantity}}</td>
-                      <td>{{item.product_name.category}}</td>
-                      <td><a href="{% url 'remove_from_cart' item.id %}">Remove</a></td>
+                      <td>{{item.category}}</td>
+                      <td><a href="{% url 'remove_from_cart' item.id %}" class="text-decoration-none text-black">Remove</a></td>
                 {% endfor %}
                 </table>
                   <hr class="my-4">  
                 <div class="row ">
                     <div class="pt-5 col mt-3">
                     <h6 class="mb-0"><a href="#!" class="text-body"><i
-                          class="fas fa-long-arrow-alt-left me-2"></i>Back to shop</a></h6>
+                          class="fas fa-long-arrow-alt-left me-2"></i>Back to Inventory</a></h6>
                     </div>
                     <div class="pt-5 col " id="register">
                       <form action="{% url 'view_cart' %}" method="post">
