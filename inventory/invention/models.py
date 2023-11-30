@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import User
 
 class Product(models.Model):
@@ -9,6 +10,11 @@ class Product(models.Model):
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='images')
+
+    # def update_available_count(self, quantity):
+    #     # Update available_count using F() expressions to ensure concurrency safety
+    #     self.available_count = F('available_count') - quantity
+    #     self.save(update_fields=['available_count'])
 
     def __str__(self):
         return self.name

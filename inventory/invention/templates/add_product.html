@@ -29,9 +29,19 @@
                </div>
           <div class="col p-4 d-flex flex-column position-static" >
             <form method="POST" enctype="multipart/form-data" >
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token%}
                 
                 <center><h1 style="font-style:Serif">PRODUCT FORM</h1></center>
+                <div class="mb-3">
+                  {% if messages %}
+                  <ul class="messages">
+                      {% for message in messages %}
+                      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                      {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Product Name</label>
                   <input type="text" class="form-control" id="exampleInputEmail1"name="name">
@@ -52,8 +62,8 @@
                   <div class="mb-3">
                     <label for="select" class="form-label">Category</label>
                     <select  class="form-select" id="select" name="category"> 
-                        <option selected disabled>--SELECT--</option>
-                        {% for i in category%}
+                      <option disabled selected>--SELECT--</option>
+                      {% for i in category%}
                         <option value="{{i.name}}">{{i.name}}</option>
                         {% endfor %}
                     </select>
@@ -62,6 +72,7 @@
                     <label for="img" class="form-label">Image</label>
                     <input type="file" class="form-control" id="img"  name="image">
                   </div>
+                 
 
                    
                 <button type="submit" class="btn btn-primary">Submit</button>

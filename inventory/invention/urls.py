@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
@@ -23,9 +22,19 @@ urlpatterns = [
     path('add/<int:product_id>', views.add_to_cart, name="add_to_cart"),
     path('remove/<int:item_id>', views.remove_from_cart, name="remove_from_cart"),
     path('logout/', LogoutView.as_view() , name="logout"),
-    # path('cart/', views.cart, name="cart"),
     path('product_description/<int:pk>', views.product_description, name="Product_description"),
 
+    #admin
+    path('admin_views/', views.admin_view, name='admin_views'),
+
+    path('wastage_render/', views.wastage, name='wastage_render'),
+
+    path('no_permisson/', views.no_permission, name='no_permission'),
+
+
+    path('appoint_admin/<int:user_id>/', views.appoint_admin, name='appoint_admin'),
+    path('remove_role/<int:user_id>/', views.remove_role, name='remove_role'),
+    path('users/', views.users_list, name='users_list'),
 ]
 
 if settings.DEBUG:
