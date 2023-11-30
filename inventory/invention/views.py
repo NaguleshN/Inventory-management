@@ -8,16 +8,21 @@ import sweetify
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 
-#User
+from social_core.exceptions import AuthForbidden
+def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
+    allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in']
+    if user and user.email not in allowed_emails:
+        return redirect('custom_forbidden')
+    return {'details': details, 'user': user, 'is_new': is_new}
+
+def custom_forbidden(request):
+    if request.method=="POST":
+        return render(request, 'login.html')
+    return render(request, 'custom_forbidden.html')
+
 @login_required
 def home(request):
-    # products = Product.objects.all()
-    # query = request.GET.get('query', '')
 
-    # if query:
-    #    products = products.filter(name__icontains = query)
-
-    # return render(request, 'home.html', {'products': products,})
     products = Product.objects.all()
     purchased_items = PurchasedItems.objects.filter(user = request.user)
     cart_items = Cart.objects.all()
@@ -46,11 +51,7 @@ def about(request):
 @login_required
 def logs(request):
 	return render(request, 'logs.html')
-# @login_required
-# def cart(request):
-# 	return render(request, 'cart.html')
 
-#Product Details
 @login_required
 def add_product(request):
    category=Category.objects.all()
@@ -177,3 +178,4 @@ def remove_from_cart(request,item_id):
     cart_item = Cart.objects.get(id=item_id)
     cart_item.delete()
     return redirect('Home')
+

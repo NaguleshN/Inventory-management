@@ -45,6 +45,12 @@ INSTALLED_APPS = [
     
     #django built in app 
     'social_django',
+    
+    # gpt
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.microsoft',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +60,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware', 
+    'allauth.account.middleware.AccountMiddleware',   
 ]
 
 ROOT_URLCONF = 'inventory.urls'
@@ -91,14 +98,26 @@ DATABASES = {
     }
 }
 
+
+
 AUTHENTICATION_BACKENDS = (
     
     'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.azuread.AzureADOAuth2',
     'social_core.backends.azuread_tenant.AzureADTenantOAuth2',
+    'allauth.account.auth_backends.AuthenticationBackend',
     
 )
 
+# SOCIALACCOUNT_PROVIDERS = {
+#     'microsoft': {
+#         'SCOPE': [
+#             'User.Read',
+#         ],
+#         'MICROSOFT_AUTH_CLIENT_ID': '1fa4a57c-06d8-4d51-b2b2-c39c423bad1e',
+#         'MICROSOFT_AUTH_CLIENT_SECRET': '638a8658-a96a-4c21-8952-f376203358cc',
+#     }
+# }
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_KEY = '1fa4a57c-06d8-4d51-b2b2-c39c423bad1e'
 SOCIAL_AUTH_AZUREAD_TENANT_OAUTH2_SECRET = 'Xgt8Q~pCb80xxl-SQiIOyWHp2p0XpT_rfdSVzbAD'
 
@@ -113,10 +132,16 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.social_auth.associate_by_email',
     'social_core.pipeline.user.create_user',
+    # 'invention.views.save_profile',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
+    'invention.views.restrict_user_pipeline'
 )
+
+# settings.py
+
+# SOCIALACCOUNT_ADAPTER = 'invention.auth_backends.CustomMicrosoftAccountAdapter'
 
 LOGIN_REDIRECT_URL="home/"
 LOGOUT_REDIRECT_URL="/"
