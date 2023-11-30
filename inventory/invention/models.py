@@ -9,7 +9,6 @@ class Product(models.Model):
     decription=models.CharField(max_length=100)
     actual_count=models.PositiveIntegerField()
     available_count=models.PositiveIntegerField()
-    # dummy_count = models.PositiveIntegerField(default=0)
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='images')
@@ -35,7 +34,6 @@ class Category(models.Model):
     
     
 class Cart(models.Model):
-    # Roll_number=models.CharField(max_length=8)
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField(default=0)
     due_date=models.DateTimeField(auto_now=True)

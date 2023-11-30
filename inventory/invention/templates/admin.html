@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block base %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,299 +8,93 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
     <title>Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
         body {
-            min-height: 100vh;
+            background: url('your-background-image.jpg') no-repeat center center fixed;
+            background-size: cover;
         }
-        a {
-            text-decoration: none;
-        }
-        li {
-            list-style: none;
-        }
-        h1,
-        h2 {
-            color: #444;
-        }
-        h3 {
-            color: #999;
-        }
-        .btn {
-            background: #f05462;
-            color: white;
-            padding: 5px 10px;
-            text-align: center;
-        }
-        .btn:hover {
-            color: #f05462;
-            background: white;
-            padding: 3px 8px;
-            border: 2px solid #f05462;
-        }
-        .title {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 15px 10px;
-            border-bottom: 2px solid #999;
-        }
-        table {
-            padding: 10px;
-        }
-        th,
-        td {
-            text-align: left;
-            padding: 8px;
-        }
-        .side-menu {
-            position: fixed;
-            background: #00bfff;
-            width: 20vw;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .side-menu .brand-name {
-            height: 10vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .side-menu li {
-            font-size: 24px;
-            padding: 10px 40px;
-            color: white;
-            display: flex;
-            align-items: center;
-        }
-        .side-menu li:hover {
-            background: white;
-            color: #f05462;
-        }
-        .container {
-            
+        .overlay {
+            background-color: rgba(0, 0, 0, 0);
             position: absolute;
-            right: 0;
-            width: 80vw;
-            height: 100vh;
-            background: white;
-        }
-        .container .header {
-            position: fixed;
             top: 0;
+            bottom: 0;
+            left: 0;
             right: 0;
-            width: 80vw;
-            height: 10vh;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+        /* Adjust the styles below for content positioning */
+        .container {
+            position: relative;
             z-index: 1;
         }
-        .container .header .nav {
-            width: 90%;
-            display: flex;
-            align-items: center;
-        }
-        .container .header .nav .search {
-            flex: 3;
-            display: flex;
-            justify-content: center;
-        }
-        .container .header .nav .search input[type=text] {
-            border: none;
-            background: #f1f1f1;
-            padding: 10px;
-            width: 50%;
-        }
-        .container .header .nav .search button {
-            width: 40px;
-            height: 40px;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container .header .nav .search button img {
-            width: 30px;
-            height: 30px;
-        }
-        .container .header .nav .user {
-            flex: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .container .header .nav .user img {
-            width: 40px;
-            height: 40px;
-        }
-        .container .header .nav .user .img-case {
-            position: relative;
-            width: 50px;
-            height: 50px;
-        }
-        .container .header .nav .user .img-case img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .container .content {
-            position: relative;
-            margin-top: 10vh;
-            min-height: 90vh;
-            background:white;
-        }
-        .container .content .cards {
-            padding: 20px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        .container .content .cards .card {
-            width: 250px;
-            height: 150px;
-            background: white;
-            margin: 20px 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        }
-        .container .content .content-2 {
-            min-height: 60vh;
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            flex-wrap: wrap;
-        }
-        .container .content .content-2 .recent-payments {
-            min-height: 50vh;
-            flex: 5;
-            background: white;
-            margin: 0 25px 25px 25px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            display: flex;
-            flex-direction: column;
-        }
-        .container .content .content-2 .new-students {
-            flex: 2;
-            background: white;
-            min-height: 50vh;
-            margin: 0 25px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            display: flex;
-            flex-direction: column;
-        }
-       
-        @media screen and (max-width: 1050px) {
-            .side-menu li {
-                font-size: 18px;
-            }
-        }
-        @media screen and (max-width: 940px) {
-            .side-menu li span {
-                display: flex;
-            }
-            .side-menu {
-                align-items: center;
-            }
-            .side-menu li a {
-                width: 40px;
-                height: 40px;
-            }
-            .side-menu li:hover {
-                background: #f05462;
-                padding: 8px 38px;
-                border: 2px solid white;
-            }
-        }
-        @media screen and (max-width:536px) {
-            .brand-name h1 {
-                font-size: 16px;
-            }
-            .container .content .cards {
-                justify-content: center;
-            }
-            .side-menu li img {
-                width: 30px;
-                height: 30px;
-            }
-            
+        .content {
+            margin-top: 50px; /* Adjust spacing as needed */
         }
     </style>
 </head>
 
 <body>
-    <div class="side-menu">
-        <div class="brand-name">
-            <h1>Admin Page</h1>
-        </div>
-        <ul>
-            <li> <span><a href="{% url 'admin' %}">Logs</a></span> </li>
-            <li><span><a href="{% url 'Add_wastage' %}">Wastage</a></span> </li>
-            <li><span><a href="{% url 'Add_product' %}">Add Products</a></span> </li>
-            <li><span><a href="{% url 'Add_category' %}">Add Category</a></span></li>
-            
-        </ul>
-    </div>
-    {% block content %}
-    <div class="container">
-        
-        
-        <div class="content" style="padding:20px">
-            
-            
-           
-            <div class="content-2">
-                <div class="recent-payments">
-                    <div class="title">
-                        <h2>ALL LOGS DETAIL</h2>
-                        
-                    </div>
-                    <table>
-                        <tr>
-                            <th>Roll Number</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                        </tr>
-                        {% for i in log %}
-                        <tr>
-                            <td>{{i.user}}</td>
-                            <td>{{i.product.name}}</td>
-                            <td>{{i.quantity}}</td>
-                            <td>{{i.created_at}}</td>
-                            {% if i.status == 'checked_out' %}
-                            <td><a href="#" class="btn">Checked out</a></td>
-                            {% else %}
-                            <td><a href="#" class="btn">Checked In</a></td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                        
-                    </table>
-                </div>
-                
-                
+    <div class="overlay"></div>
+    <div class="container mt-5 vh-100">
+        <div class="card p-4">
+            <div class="card-header bg-primary text-white text-center">
+                <h1 class="mb-0">Admin Page</h1>
             </div>
-            
+            <div class="card-body">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a href="{% url 'admin_views' %}" class="nav-link">Logs</a></li>
+                    <li class="nav-item"><a href="{% url 'wastage_render' %}" class="nav-link">Wastage</a></li>
+                    <li class="nav-item"><a href="{% url 'Add_product' %}" class="nav-link">Add Products</a></li>
+                    <li class="nav-item"><a href="{% url 'Add_category' %}" class="nav-link">Add Category</a></li>
+                    <li class="nav-item"><a href="{% url 'users_list' %}" class="nav-link">Add admin</a></li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="card bg-white">
+                    <div class="card-header bg-light">
+                        <h2 class="card-title">ALL LOGS DETAIL</h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Roll Number</th>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in log %}
+                                    <tr>
+                                        <td>{{i.user}}</td>
+                                        <td>{{i.product.name}}</td>
+                                        <td>{{i.quantity}}</td>
+                                        <td>{{i.created_at}}</td>
+                                        <td>
+                                            {% if i.status == 'checked_out' %}
+                                            <span class="badge bg-danger">Checked out</span>
+                                            {% else %}
+                                            <span class="badge bg-success">Checked In</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
+
+{% endblock %}

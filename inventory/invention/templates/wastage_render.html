@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block base %}
+<style>
+    body {
+        background: url('your-background-image.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .overlay {
+        background-color: rgba(0, 0, 0, 0);
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
+    /* Adjust the styles below for content positioning */
+    .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .content {
+        margin-top: 50px; /* Adjust spacing as needed */
+    }
+</style>
+
+<div class="overlay"></div>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <table class="table table-striped table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Reason</th>
+                <th>Created At</th>
+                <th>Recipient Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in wastage %}
+            <tr>
+                <td>{{ i.product_name.name }}</td>
+                <td>{{ i.category.name }}</td>
+                <td>{{ i.quantity }}</td>
+                <td>{{ i.reason }}</td>
+                <td>{{ i.created_at }}</td>
+                <td>{{ i.roll_number }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
