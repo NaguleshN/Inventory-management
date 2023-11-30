@@ -7,8 +7,10 @@ from .models import *
 import sweetify
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from django.http import HttpResponseForbidden
 
-from social_core.exceptions import AuthForbidden
+from .decorators import unauthenticated_user,allowed_user
+
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
     allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in']
     if user and user.email not in allowed_emails:
@@ -24,7 +26,7 @@ def custom_forbidden(request):
 def home(request):
 
     products = Product.objects.all()
-    purchased_items = PurchasedItems.objects.filter(user = request.user)
+    purchased_items = PurchasedItem.objects.filter(user = request.user)
     cart_items = Cart.objects.all()
     query = request.GET.get('query', '')
 
