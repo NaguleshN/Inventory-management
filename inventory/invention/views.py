@@ -39,11 +39,11 @@ def home(request):
     #     if product.id in cart_qty:
     #         product.available_count-= cart_qty[product.id]
 
-    pur_qty = {item.product.id:item.quantity for item in purchased_items}
+    # pur_qty = {item.product.id:item.quantity for item in purchased_items}
 
-    for product in products:
-        if product.id in pur_qty:
-            product.available_count -= pur_qty[product.id]
+    # for product in products:
+    #     if product.id in pur_qty:
+    #         product.available_count -= pur_qty[product.id]
 
     return render(request, 'home.html', {'products': products,})
 
