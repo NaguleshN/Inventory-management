@@ -6,15 +6,15 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
-    path('complete/azuread-tenant-oauth2/home/', views.home ,name="Home"), 
+    path('', views.login ,name="Login"), 
     path('home/', views.home ,name="Home"), 
+    path('complete/azuread-tenant-oauth2/home/', views.home ,name="Home"), 
     path('about/', views.about , name="About"),
 
-
+    path('forbidden/', views.custom_forbidden, name='custom_forbidden'),
     #Product detail
     path('add_product/', views.add_product ,name="Add_product"), 
     path('add_category/', views.add_category, name="Add_category"),
-    path('', views.login ,name="Login"), 
     path('register/', views.register ,name="Register"), 
     path('cart/', views.view_cart, name='view_cart'),
     path('logs/', views.logs, name="logs"),

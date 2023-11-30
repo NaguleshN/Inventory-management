@@ -13,11 +13,22 @@ from .decorators import unauthenticated_user, allowed_user
 from django.contrib.auth.models import Group, User
 
 
-#User
+from social_core.exceptions import AuthForbidden
+def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
+    allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in']
+    if user and user.email not in allowed_emails:
+        return redirect('custom_forbidden')
+    return {'details': details, 'user': user, 'is_new': is_new}
+
+def custom_forbidden(request):
+    if request.method=="POST":
+        return render(request, 'login.html')
+    return render(request, 'custom_forbidden.html')
+
 @login_required
 def home(request):
     products = Product.objects.all()
-    purchased_items = PurchasedItems.objects.filter(user = request.user)
+    purchased_items = PurchasedItem.objects.filter(user = request.user)
     cart_items = Cart.objects.all()
     query = request.GET.get('query', '')
     if query:
@@ -179,7 +190,7 @@ def view_cart(request):
     cart_items = Cart.objects.filter(created_by=request.user)
     if request.method=="POST":
         for i in cart_items:
-            cart_item = PurchasedItems.objects.create(product=i.product_name,quantity=i.quantity, user=request.user)
+            cart_item = PurchasedItem.objects.create(product=i.product_name,quantity=i.quantity, user=request.user)
             cart_item.quantity =i.quantity
             cart_item.save()
             x = datetime.now()
