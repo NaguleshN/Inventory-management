@@ -13,7 +13,6 @@ from .decorators import unauthenticated_user, allowed_user
 from django.contrib.auth.models import Group, User
 
 
-from social_core.exceptions import AuthForbidden
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
     allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in']
     if user and user.email not in allowed_emails:
