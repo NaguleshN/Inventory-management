@@ -121,7 +121,7 @@ border-bottom-right-radius: 16px;
                   <tbody>
                     {% for item in cart_items %}
                     <tr>
-                      <td><img src="{{MEDIA_URL}}{{item.product_name.image.url}}"  ></td>
+                      <td><img src="{{MEDIA_URL}}{{item.product_name.image.url}}" height= '150' width='200'  ></td>
                       <td>{{ item.product_name.name }}</td>
                       <td><button class="btn btn-link px-2"
                         onclick="this.parentNode.querySelector('input[type=number]').stepDown()">

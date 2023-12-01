@@ -107,9 +107,11 @@ def add_wastage(request):
        roll_number = request.POST.get('roll_number')
        quantity = request.POST.get('quantity')
        reason = request.POST.get('reason')
-       cat=request.POST.get("category")
-
-       category=Category.objects.get(name=cat)
+    #    cat=request.POST.get("category")
+       p=Product.objects.filter(name=product_name)
+       for i in p:
+        category=i.category
+    #    category=Category.objects.get(name=cat)
 
 
 
