@@ -14,7 +14,7 @@ from django.contrib.auth.models import Group, User
 
 
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
-    allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in']
+    allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in','paramasivan.22mc@kct.ac.in']
     if user and user.email not in allowed_emails:
         return redirect('custom_forbidden')
     return {'details': details, 'user': user, 'is_new': is_new}
@@ -53,10 +53,11 @@ def home(request):
     return render(request, 'home.html', {'products': products,})
 
 
-
+@login_required
 def about(request):
 	return render(request, 'about.html')
-@login_required
+
+
 def logs(request):
 	return render(request, 'logs.html')
 
@@ -74,7 +75,9 @@ def add_product(request):
          img=request.FILES["image"]   
          cat=request.POST.get("category")
          category=Category.objects.get(name=cat)
-         if actual_count >= available_count:
+         print(actual_count)
+         print(available_count)
+         if int(actual_count) >= int(available_count):
             print("exec add product")
             Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img)
             sweetify.success(request, 'Look Up the Available Quantity',button="OK")
@@ -179,7 +182,8 @@ def register(request):
             if user!=None:
                     auth.login(request,user)
                     sweetify.success(request, 'You are successfully created',button="OK")
-                    return redirect('Home')
+                    messages.success(request, f"Account Successfully Created for {rollno}")
+                    return redirect('Login')
     return render(request, 'register.html')
 
 @login_required
@@ -195,13 +199,12 @@ def add_to_cart(request,product_id):
 def view_cart(request):
     cart_items = Cart.objects.filter(created_by=request.user)
     if request.method=="POST":
-        for i in cart_items:
-            cart_item = PurchasedItem.objects.create(product=i.product_name,quantity=i.quantity, user=request.user)
-            cart_item.quantity =i.quantity
+        for item in cart_items:
+            cart_item = PurchasedItem.objects.create(product=item.product_name,quantity=item.quantity, user=request.user)
+            cart_item.quantity =item.quantity
             cart_item.save()
-            x = datetime.now()
-            log_item = Log.objects.create(product = i.product_name, user=request.user, quantity = i.quantity, created_at = x, status = 'checked_in')
-            Cart.objects.filter(product_name=i.product_name).delete()
+            log_item = Log.objects.create(product = item.product_name, user=request.user, quantity = item.quantity, created_at = datetime.now(), status = 'checked_in')
+            Cart.objects.filter(product_name=item.product_name).delete()
         return redirect("Home")
 
     return render(request,'cart.html',{'cart_items': cart_items,})
