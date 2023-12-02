@@ -213,8 +213,11 @@ def view_cart(request):
 @login_required
 def remove_from_cart(request,item_id):
     cart_item = Cart.objects.get(id=item_id)
-    cart_item.delete()
-    return redirect('Home')
+    cart_item.quantity -= 1
+    cart_item.save()
+    if cart_item.quantity == 0:
+        cart_item.delete()
+    return redirect('view_cart')
 
 
 @allowed_user(allowed_roles=['staff', 'superadmin'])
