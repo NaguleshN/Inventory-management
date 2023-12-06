@@ -37,10 +37,11 @@
                     <li class="nav-item mx-2">
                         <a class="nav-link active" href="{% url 'Add_wastage'%}">Wastage</a>
                     </li>
-                    {% comment %} <li>
+                    {% if request.user.is_staff %}
+                    <li>
                         <a   class="nav-link active" href="{% url 'admin_views' %}">Admin</a>
-                    </li>  {% endcomment %}
-                    
+                    </li> 
+                    {% endif %}
                 </ul>
             </div>
             {% comment %} {%if len( user.username )>9 %} {% endcomment %}
