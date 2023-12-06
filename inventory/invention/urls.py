@@ -6,8 +6,8 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
-    path('', views.login ,name="Login"), 
-    path('home/', views.home ,name="Home"), 
+    path('login/', views.login ,name="login"), 
+    path('', views.home ,name="Home"), 
     path('complete/azuread-tenant-oauth2/home/', views.home ,name="Home"), 
     path('about/', views.about , name="About"),
 
@@ -20,7 +20,7 @@ urlpatterns = [
     path('logs/', views.logs, name="logs"),
     path('add_wastage/', views.add_wastage, name="Add_wastage"),
     path('add/<int:product_id>', views.add_to_cart, name="add_to_cart"),
-    path('remove/<int:item_id>', views.remove_from_cart, name="remove_from_cart"),
+    path('remove/<int:product_id>', views.remove_from_cart, name="remove_from_cart"),
     path('logout/', LogoutView.as_view() , name="logout"),
     path('product_description/<int:pk>', views.product_description, name="Product_description"),
 
