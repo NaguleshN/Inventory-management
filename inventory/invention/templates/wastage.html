@@ -44,14 +44,7 @@
               <label for="exampleInputEmail1" class="form-label">Reason</label>
               <input type="text" class="form-control" id="exampleInputEmail1"  name="reason">
             </div>
-            <div class="mb-3">
-              <label for="select" class="form-label">Category</label>
-              <select  class="form-select" id="select" name="category"> 
-                  {% for i in category%}
-                  <option value="{{i.name}}">{{i.name}}</option>
-                  {% endfor %}
-              </select>
-            </div>
+            
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>

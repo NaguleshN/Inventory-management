@@ -1,4 +1,4 @@
-{% extends "base.html"%}
+{% extends "base.html" %}
 
 {% block base %}
 <style>
@@ -9,8 +9,7 @@
 </style>
 
 {% comment %} search bar {% endcomment %}
- <div class="container  p-4 shadow-lg  " id=
- "search">
+ <div class="container  p-4 shadow-lg" id="search">
   <form action="{% url 'Home' %}" method="get">
 <div class="input-group">
 	<input type="text" name="query" value="{{query}}" class="form-control" placeholder="Search for...">
@@ -36,6 +35,8 @@
                           <th>Actual Quantity</th>
                           <th>Available Quantity</th>
                           <th>Category</th>
+                          <th></th>
+                          <th>Cart</th>
                         </tr>  
                       </thead>
                       <tbody>
@@ -50,8 +51,20 @@
                           <td>
                           <form action="{% url 'add_to_cart' product.id %}">
                           {% csrf_token%}
-                          <button class="btn btn-outline-primary">ADD</button>
+                          <button class="btn btn-outline-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+</svg>
+                          </button>
                           </form>
+
+                          <form action="{% url 'remove_from_cart' product.id %}">
+                          {% csrf_token%}
+                          <button class="btn btn-outline-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash-lg" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 8"/>
+</svg>
+                          </button>
+                          </form>
+
                           </td>
                         </tr>
                         {% endfor %}
