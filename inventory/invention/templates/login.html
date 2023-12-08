@@ -118,17 +118,15 @@
                
                 <button type="submit" class="submit bg-info ">LOGIN</button>
             </div>
-
-            ADMIN:
-            <a href="{% url "social:begin" 'azuread-tenant-oauth2' %}">MICROSOFT </a>
-            
-        <div class="message">
+            <span>
+            <p style="font-family:verdana;">ADMIN:</p>
+            <center><a href="{% url "social:begin" 'azuread-tenant-oauth2' %}"><img class="logo" role="img" pngsrc="https://logincdn.msftauth.net/shared/1.0/content/images/microsoft_logo_ea19b2112f4dfd8e90b4505ef7dcb4f9.png" svgsrc="https://logincdn.msftauth.net/shared/1.0/content/images/microsoft_logo_564db913a7fa0ca42727161c6d031bef.svg" data-bind="imgSrc, attr: { alt: str['MOBILE_STR_Footer_Microsoft'] }" src="https://logincdn.msftauth.net/shared/1.0/content/images/microsoft_logo_564db913a7fa0ca42727161c6d031bef.svg" alt="Microsoft"></a></center>
+            </span>
+            <div class="message">
               {% for message in messages %}
               <p> {{message}} </p>  
               {% endfor %}
             </div> 
-           
-            
         </form>
          </div>
         
