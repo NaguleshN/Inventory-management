@@ -38,11 +38,11 @@ def home(request):
     if query:
        products = products.filter(name__icontains = query)
 
-    # cart_qty = {item.product_name.id:item.quantity for item in cart_items}
+    cart_qty = {item.product_name.id:item.quantity for item in cart_items}
 
-    # for product in products:
-    #     if product.id in cart_qty:
-    #         product.available_count-= cart_qty[product.id]
+    for product in products:
+        if product.id in cart_qty:
+            product.available_count-= cart_qty[product.id]
 
     # pur_qty = {item.product.id:item.quantity for item in purchased_items}
 
