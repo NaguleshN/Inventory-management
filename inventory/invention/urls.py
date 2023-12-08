@@ -26,12 +26,9 @@ urlpatterns = [
 
     #admin
     path('admin_views/', views.admin_view, name='admin_views'),
-
+    
     path('wastage_render/', views.wastage, name='wastage_render'),
-
     path('no_permisson/', views.no_permission, name='no_permission'),
-
-
     path('appoint_admin/<int:user_id>/', views.appoint_admin, name='appoint_admin'),
     path('remove_role/<int:user_id>/', views.remove_role, name='remove_role'),
     path('users/', views.users_list, name='users_list'),

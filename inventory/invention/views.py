@@ -24,7 +24,7 @@ def custom_forbidden(request):
     return render(request, 'custom_forbidden.html')
 
 @login_required(login_url= 'login')
-@allowed_user(allowed_roles=['student_user','admin'])
+@allowed_user(allowed_roles=['student_user','admin', 'superadmin'])
 def home(request):
     if len(request.user.username)>9:
         user = get_object_or_404(User, id=request.user.id)
