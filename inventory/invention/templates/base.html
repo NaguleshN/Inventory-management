@@ -37,7 +37,7 @@
                     <li class="nav-item mx-2">
                         <a class="nav-link active" href="{% url 'Add_wastage'%}">Wastage</a>
                     </li>
-                    {% if request.user.is_staff %}
+                   {% if request.user.group == "admin" or "superadmin" %}
                     <li>
                         <a   class="nav-link active" href="{% url 'admin_views' %}">Admin</a>
                     </li> 

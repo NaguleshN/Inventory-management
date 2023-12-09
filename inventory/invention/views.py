@@ -9,7 +9,8 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from .decorators import *
 from django.contrib.auth.models import Group, User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
+from collections import defaultdict
 
 
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
@@ -37,18 +38,7 @@ def home(request):
     query = request.GET.get('query', '')
     if query:
        products = products.filter(name__icontains = query)
-
-    cart_qty = {item.product_name.id:item.quantity for item in cart_items}
-
-    for product in products:
-        if product.id in cart_qty:
-            product.available_count-= cart_qty[product.id]
-
-    # pur_qty = {item.product.id:item.quantity for item in purchased_items}
-
-    # for product in products:
-    #     if product.id in pur_qty:
-    #         product.available_count -= pur_qty[product.id]
+    
 
     return render(request, 'home.html', {'products': products,})
 
@@ -79,7 +69,7 @@ def add_product(request):
          print(available_count)
          if int(actual_count) >= int(available_count):
             print("exec add product")
-            Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img)
+            Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img, dummy_count = available_count)
             sweetify.success(request, 'Look Up the Available Quantity',button="OK")
             return redirect("Add_product")
          else:
@@ -181,43 +171,110 @@ def register(request):
                     auth.login(request,user)
                     sweetify.success(request, 'You are successfully created',button="OK")
                     messages.success(request, f"Account Successfully Created for {rollno}")
-                    return redirect('login')
+                    return redirect('Home')
                 
     return render(request, 'register.html')
 
-@login_required(login_url='login')
-def add_to_cart(request,product_id):
-    product = Product.objects.get(id=product_id)
-    cart_item ,created= Cart.objects.get_or_create(product_name=product,created_by=request.user)
-    cart_item.quantity += 1
-    cart_item.save()
+temporary_cart = defaultdict(int)
+
+def add_to_cart(request, product_id):
+    products = Product.objects.get(id = product_id)
+    if products.available_count == 0:
+        return HttpResponse("Cann't add")
+    quantity = 1  # Replace with actual quantity from user input
+    temporary_cart[product_id] += quantity
     return redirect('Home')
+    # return render(request, 'home.html', {'products':products,})
 
 
-@login_required(login_url='login')
-def view_cart(request):
-    cart_items = Cart.objects.filter(created_by=request.user)
-    if request.method=="POST":
-        for item in cart_items:
-            cart_item = PurchasedItem.objects.create(product=item.product_name,quantity=item.quantity, user=request.user)
-            cart_item.quantity =item.quantity
-            cart_item.save()
-            log_item = Log.objects.create(product = item.product_name, user=request.user, quantity = item.quantity, created_at = datetime.now(), status = 'checked_in')
-            Cart.objects.filter(product_name=item.product_name).delete()
-        return redirect("Home")
+# @login_required
+# def add_to_cart(request,product_id):
+#     product = Product.objects.get(id=product_id)
+#     cart_item ,created= Cart.objects.get_or_create(product_name=product,created_by=request.user)
+#     cart_item.quantity += 1
+#     cart_item.save()
+#     return redirect('Home')
 
-    return render(request,'cart.html',{'cart_items': cart_items,})
-
-
-@login_required(login_url='login')
-def remove_from_cart(request,product_id):
-    cart_item = Product.objects.get(id=product_id)
-    cart_obj=Cart.objects.get(product_name=cart_item,created_by=request.user)
-    cart_obj.quantity -= 1
-    cart_obj.save()
-    if cart_obj.quantity == 0:
-        cart_obj.delete()
+def remove_from_cart(request, product_id):
+    if product_id in temporary_cart:
+        if temporary_cart[product_id] > 0:
+                del temporary_cart[product_id]
     return redirect('view_cart')
+
+def decrease_quantity(request, product_id):
+  
+    if product_id in temporary_cart:
+        temporary_cart[product_id] -= 1
+        if temporary_cart[product_id] == 0:
+            del temporary_cart[product_id]
+    return redirect('view_cart')
+
+def increase_quantity(request, product_id):
+
+    if product_id in temporary_cart:
+        product = Product.objects.get(pk=product_id)
+        if product.available_count > temporary_cart[product_id]:
+            temporary_cart[product_id] += 1
+    return redirect('view_cart')
+
+
+# cart
+def view_cart(request):
+        cart_items = []
+        for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+        return render(request, 'cart.html', {'cart_items':cart_items,})
+
+def submit_cart(request):
+
+    print("Hii")
+    for product_id, quantity in temporary_cart.items():
+        product = Product.objects.get(pk=product_id)
+        if product.available_count >= quantity:
+            print(product)
+            print(quantity)
+            product.available_count -= quantity
+            product.save()
+            PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user)
+            Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in")
+    temporary_cart.clear()
+    return redirect("Home")
+
+def update_quantity(request, product_id, quantity):
+    product = get_object_or_404(Product, id=product_id)
+    if product.available_count >= quantity:
+        product.available_count -= quantity
+        product.save()
+        updated_available_quantity = product.available_count
+        return JsonResponse({'success': True, 'updatedAvailableQuantity': updated_available_quantity})
+    else:
+        return JsonResponse({'success': False})
+    
+
+# @login_required
+# def view_cart(request):
+#     cart_items = Cart.objects.filter(created_by=request.user)
+#     if request.method=="POST":
+#         for i in cart_items:
+#             cart_item, created = PurchasedItem.objects.get_or_create(product=i.product_name,quantity=i.quantity, user=request.user)
+#             cart_item.quantity =i.quantity
+#             cart_item.save()
+#             x = datetime.now()
+#             log_item = Log.objects.create(product = i.product_name, user=request.user, quantity = i.quantity, created_at = x, status = 'checked_in')
+#             Cart.objects.filter(product_name=i.product_name).delete()
+#         return redirect("Home")
+
+#     return render(request,'cart.html',{'cart_items': cart_items,})
+
+
+
+# @login_required
+# def remove_from_cart(request,item_id):
+#     cart_item = Product.objects.get(id=item_id)
+#     cart_item.delete()
+#     return redirect('Home')
+
 
 
 @login_required(login_url='login')
@@ -225,6 +282,8 @@ def remove_from_cart(request,product_id):
 def admin_view(request):
     log = Log.objects.all()
     return render(request, 'admin.html', {'log':log,})
+
+
 
 
 @allowed_user(allowed_roles=(['admin', 'superadmin']))
@@ -237,6 +296,8 @@ def no_permission(request):
     return render(request, 'no_permission.html')
 
 
+
+
 @allowed_user(allowed_roles=['superadmin'])
 def appoint_admin(request, user_id):
     if request.method == 'POST':
@@ -247,6 +308,8 @@ def appoint_admin(request, user_id):
     else:
         pass
     return redirect(request, 'users.html', {'user':user, } )
+
+
 
 
 @login_required(login_url='login')
@@ -262,6 +325,8 @@ def remove_role(request, user_id):
     return redirect(request, 'users.html', {'user':user, } )
 
 
+
+    
 @login_required(login_url='login')
 @allowed_user(allowed_roles=['superadmin'])
 def users_list(request):

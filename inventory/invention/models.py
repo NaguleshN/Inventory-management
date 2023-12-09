@@ -7,6 +7,7 @@ class Product(models.Model):
     decription=models.CharField(max_length=100)
     actual_count=models.PositiveIntegerField()
     available_count=models.PositiveIntegerField()
+    dummy_count = models.PositiveIntegerField()
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='images')
@@ -31,7 +32,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
-    
+temporary_cart = {} 
 class Cart(models.Model):
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField(default=0)
@@ -62,13 +63,13 @@ class PurchasedItem(models.Model):
     
     def _str_(self):
         return str(self.product)
-    
+
     
 class Log(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
 
     def _str_(self):

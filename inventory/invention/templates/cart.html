@@ -114,51 +114,34 @@ border-bottom-right-radius: 16px;
                       <th>Product Name</th>
                       <th>Quantity</th>
                       <th>Category</th>
-                      <th>Quantity</th>
+                      <th>Remove Item</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for item in cart_items %}
                     <tr>
-                      <td><img src="{{MEDIA_URL}}{{item.product_name.image.url}}" height= '150' width='200'  ></td>
-                      <td>{{ item.product_name.name }}</td>
-                      <td><button class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                        <i class="fas fa-minus"></i>
-                      </button>&nbsp;{{ item.quantity}}&nbsp;<button class="btn btn-link px-2"
-                      onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                  </td>
-                      <td>{{item.category}}</td>
-                      <td>
-
-                      <a href="{% url 'remove_from_cart' item.id %}" class="text-decoration-none text-black">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                          <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
-                          </svg>
-                        </a>
-                        <a href="{% url 'remove_from_cart' item.id %}" class="text-decoration-none text-black">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
-                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                          </svg>
-                        </a>
-                      </td>
-                      
+                      <td><img src="{% static 'item.product_name.image.url'  %}" alt="item.image.url"></td>
+                      <td>{{ item.product.name }}</td>
+                      <td>{{ item.quantity}}</td>
+                      <td>{{item.product.category}}</td>
+                      <td><form action="{% url 'remove_from_cart' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">-</button>
+                    </form></td>
                 {% endfor %}
                 </table>
+                  <hr class="my-4">  
                 <div class="row ">
                     <div class="pt-5 col mt-3">
-                    <h6 class="mb-0"><a href="{% url 'Home' %}" class="text-body"><i
-                          class="fas fa-long-arrow-alt-left me-2" ></i>Back to Inventory</a></h6>
+                    <h6 class="mb-0"><a href="#!" class="text-body"><i
+                          class="fas fa-long-arrow-alt-left me-2"></i>Back to shop</a></h6>
                     </div>
                     <div class="pt-5 col " id="register">
-                      <form action="{% url 'view_cart' %}" method="post">
-                        {% csrf_token %}
-                          <button type="submit" class="btn btn-dark btn-block btn-lg"
-                        data-mdb-ripple-color="dark">Submit</button>
-                      </form>
+                        <form action="{% url 'submit_cart' %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="Submit Cart">
+                        </form>
                     </div>
                 
                 

@@ -20,7 +20,7 @@ urlpatterns = [
     path('logs/', views.logs, name="logs"),
     path('add_wastage/', views.add_wastage, name="Add_wastage"),
     path('add/<int:product_id>', views.add_to_cart, name="add_to_cart"),
-    path('remove/<int:product_id>', views.remove_from_cart, name="remove_from_cart"),
+    # path('remove/<int:item_id>', views.remove_from_cart, name="remove_from_cart"),
     path('logout/', LogoutView.as_view() , name="logout"),
     path('product_description/<int:pk>', views.product_description, name="Product_description"),
 
@@ -32,6 +32,11 @@ urlpatterns = [
     path('appoint_admin/<int:user_id>/', views.appoint_admin, name='appoint_admin'),
     path('remove_role/<int:user_id>/', views.remove_role, name='remove_role'),
     path('users/', views.users_list, name='users_list'),
+    path('cart/submit/', views.submit_cart, name='submit_cart'),
+    path('remove_from_cart/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('increase_quantity/<int:product_id>/', views.increase_quantity, name='increase_quantity'),
+    path('decrease_quantity/<int:product_id>/', views.decrease_quantity, name='decrease_quantity'),
+    path('update_quantity/<int:product_id>/<int:quantity>/', views.update_quantity, name='update_quantity'),
 ]
 
 if settings.DEBUG:
