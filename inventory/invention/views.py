@@ -7,10 +7,9 @@ from .models import *
 import sweetify
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
-from django.http import HttpResponse
-
-from .decorators import unauthenticated_user, allowed_user
+from .decorators import *
 from django.contrib.auth.models import Group, User
+from django.http import HttpResponseRedirect
 
 
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
@@ -24,11 +23,12 @@ def custom_forbidden(request):
         return render(request, 'login.html')
     return render(request, 'custom_forbidden.html')
 
-@login_required
+@login_required(login_url= 'login')
+@allowed_user(allowed_roles=['student_user','admin', 'superadmin'])
 def home(request):
     if len(request.user.username)>9:
         user = get_object_or_404(User, id=request.user.id)
-        admin_group = Group.objects.get(name='staff') 
+        admin_group = Group.objects.get(name='admin') 
         user.groups.add(admin_group)
         # return redirect('admin_views')
     products = Product.objects.all()
@@ -53,18 +53,18 @@ def home(request):
     return render(request, 'home.html', {'products': products,})
 
 
-@login_required
+@login_required(login_url='login')
 def about(request):
 	return render(request, 'about.html')
 
-
+@login_required(login_url='login')
 def logs(request):
 	return render(request, 'logs.html')
 
 
 #Product Details
-@allowed_user(allowed_roles=(['staff', 'superadmin']))
-@login_required
+@allowed_user(allowed_roles=(['admin', 'superadmin']))
+@login_required(login_url='login')
 def add_product(request):
    category=Category.objects.all()
    if request.method=="POST" and request.FILES.get('image'):
@@ -89,18 +89,17 @@ def add_product(request):
    return render (request,"add_product.html",{"category":category})
 
 
-@allowed_user(allowed_roles=['staff', 'superadmin'])
-@login_required
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
 def add_category(request):
      categories = Category.objects.all()
      if request.method == "POST":
          name = request.POST.get('name')
-
          Category.objects.create(name = name, created_by = request.user)
      return render(request, 'add_category.html', {'categories': categories})
 
 
-@login_required
+@login_required(login_url='login')
 def add_wastage(request):
     categories=Category.objects.all()
     products = Product.objects.all()
@@ -115,9 +114,6 @@ def add_wastage(request):
        for i in p:
         category=i.category
     #    category=Category.objects.get(name=cat)
-
-
-
        Wastage.objects.create(product_name=product_name,
                               roll_number=roll_number,
                               quantity=quantity,
@@ -127,15 +123,13 @@ def add_wastage(request):
     return render(request, 'wastage.html', {'category':categories,
       'products':products,})
 
-
-@login_required
+@login_required(login_url='login')
 def product_description(request, pk):
     # item = get_object_or_404(Product, pk =pk)
     item = Product.objects.get( pk =pk)
     return render(request, 'product_description.html', {'item':item,})
 
-
-
+@unauthenticated_user
 def login(request):
     if request.user.is_authenticated:
         return redirect('Home')
@@ -162,12 +156,11 @@ def login(request):
 
     return render(request,'login.html')
 
-
+@unauthenticated_user
 def register(request):
     details=User.objects.all()   
     if request.user.is_authenticated:
         return redirect('Home')
-
 
     if request.method == "POST":
         rollno = request.POST.get('rollno')
@@ -179,14 +172,20 @@ def register(request):
             print(password)
             user = User.objects.create_user(username=rollno,password=password)
             user=auth.authenticate(username=rollno,password=password)
+            
+            #New user in student_user group
+            group = Group.objects.get(name='student_user')
+            user.groups.add(group)
+            
             if user!=None:
                     auth.login(request,user)
                     sweetify.success(request, 'You are successfully created',button="OK")
                     messages.success(request, f"Account Successfully Created for {rollno}")
-                    return redirect('Login')
+                    return redirect('login')
+                
     return render(request, 'register.html')
 
-@login_required
+@login_required(login_url='login')
 def add_to_cart(request,product_id):
     product = Product.objects.get(id=product_id)
     cart_item ,created= Cart.objects.get_or_create(product_name=product,created_by=request.user)
@@ -195,7 +194,7 @@ def add_to_cart(request,product_id):
     return redirect('Home')
 
 
-@login_required
+@login_required(login_url='login')
 def view_cart(request):
     cart_items = Cart.objects.filter(created_by=request.user)
     if request.method=="POST":
@@ -210,22 +209,26 @@ def view_cart(request):
     return render(request,'cart.html',{'cart_items': cart_items,})
 
 
-@login_required
-def remove_from_cart(request,item_id):
-    cart_item = Cart.objects.get(id=item_id)
-    cart_item.delete()
-    return redirect('Home')
+@login_required(login_url='login')
+def remove_from_cart(request,product_id):
+    cart_item = Product.objects.get(id=product_id)
+    cart_obj=Cart.objects.get(product_name=cart_item,created_by=request.user)
+    cart_obj.quantity -= 1
+    cart_obj.save()
+    if cart_obj.quantity == 0:
+        cart_obj.delete()
+    return redirect('view_cart')
 
 
-@allowed_user(allowed_roles=['staff', 'superadmin'])
-@login_required
+@login_required(login_url='login')
+@allowed_user(allowed_roles=['admin', 'superadmin'])
 def admin_view(request):
     log = Log.objects.all()
     return render(request, 'admin.html', {'log':log,})
 
 
-@allowed_user(allowed_roles=(['staff', 'superadmin']))
-@login_required
+@allowed_user(allowed_roles=(['admin', 'superadmin']))
+@login_required(login_url='login')
 def wastage(request):
     wastage = Wastage.objects.all()
     return render(request, 'wastage_render.html', {'wastage': wastage,})
@@ -238,7 +241,7 @@ def no_permission(request):
 def appoint_admin(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='staff') 
+        admin_group = Group.objects.get(name='admin') 
         user.groups.add(admin_group)
         return redirect('users_list')
     else:
@@ -246,11 +249,12 @@ def appoint_admin(request, user_id):
     return redirect(request, 'users.html', {'user':user, } )
 
 
+@login_required(login_url='login')
 @allowed_user(allowed_roles=['superadmin'])
 def remove_role(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='staff') 
+        admin_group = Group.objects.get(name='admin') 
         user.groups.remove(admin_group)
         return redirect('users_list')
     else:
@@ -258,6 +262,7 @@ def remove_role(request, user_id):
     return redirect(request, 'users.html', {'user':user, } )
 
 
+@login_required(login_url='login')
 @allowed_user(allowed_roles=['superadmin'])
 def users_list(request):
     users = User.objects.all()
