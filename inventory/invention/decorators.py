@@ -18,7 +18,7 @@ def allowed_user(allowed_roles = []):
             if group in allowed_roles:
               return view_func(request, *args, **kwargs)
             else:
-                return render(request, 'no_permission.html')
+                return render(request, 'core/no_permission.html')
         return wrapper_func
     return decorator
 

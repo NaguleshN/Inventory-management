@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block base %}
+<div class="container">
+    <h1 class="text-center mb-4">Inventory Users List</h1>
+    <div class="row justify-content-center my-5">
+        <div class="col-md-10">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for user in users %}
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ user.username }}</h5>
+                            <p class="card-text">
+                                {% for group in user.groups.all %}
+                                <span class="badge bg-primary">{{ group.name }}</span>
+                                {% endfor %}
+                            </p>
+                            <div class="row">
+                                <div class="col">
+                                    <form action="{% url 'appoint_admin' user.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success me-2">Appoint as Admin</button>
+                                    </form>
+                                </div>
+                                <div class="col">
+                                    <form action="{% url 'remove_role' user.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Remove Admin Role</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

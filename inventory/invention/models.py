@@ -60,6 +60,7 @@ class PurchasedItem(models.Model):
     quantity = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True) 
+    status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     
     def _str_(self):
         return str(self.product)

@@ -36,24 +36,20 @@ def login(request):
     if request.method=='POST':
         rollno=request.POST.get('rollno')
 
-        pattern = r'^\d{2}[A-Z]{3}\d{3}$'
+        # pattern = r'^\d{2}[A-Z]{3}\d{3}$'
                     
-        if re.match(pattern, rollno):
-            password="iqube@kct"
-            print(rollno)
-            print(password)
-            user=auth.authenticate(username=rollno,password=password)
-            if user != None:
-                auth.login(request,user)
-                return redirect('Home')
-            else:
-                return redirect('Register')
-                   
+        # if re.match(pattern, rollno):
+        password="iqube@kct"
+        print(rollno)
+        print(password)
+        user=auth.authenticate(username=rollno,password=password)
+        if user != None:
+            auth.login(request,user)
+            return redirect('Home')
         else:
-            messages.warning(request, 'You have to look up the Roll Number.')
-            return render(request, 'login.html')  
-
-    return render(request,'login.html')
+            return redirect('Register')
+ 
+    return render(request,'credential/login.html')
 
 @unauthenticated_user
 def signup(request):
@@ -63,24 +59,20 @@ def signup(request):
 
     if request.method == "POST":
         rollno = request.POST.get('rollno')
-        pattern = r'^\d{2}[A-Z]{3}\d{3}$'
-                 
-        if re.match(pattern, rollno):
-            password='iqube@kct'
-            user = User.objects.create_user(username=rollno,password=password)
-            user=auth.authenticate(username=rollno,password=password)
+        password='iqube@kct'
+        user = User.objects.create_user(username=rollno,password=password)
+        user=auth.authenticate(username=rollno,password=password)           
+        #New user in student_user group
+        group = Group.objects.get(name='student_user')
+        user.groups.add(group)
             
-            #New user in student_user group
-            group = Group.objects.get(name='student_user')
-            user.groups.add(group)
-            
-            if user!=None:
-                    auth.login(request,user)
-                    sweetify.success(request, 'You are successfully created',button="OK")
-                    messages.success(request, f"Account Successfully Created for {rollno}")
-                    return redirect('Home')
+        if user!=None:
+            auth.login(request,user)
+            sweetify.success(request, 'You are successfully created',button="OK")
+            messages.success(request, f"Account Successfully Created for {rollno}")
+            return redirect('Home')
                 
-    return render(request, 'register.html')
+    return render(request, 'credential/register.html')
 
 
 #Home-Page
@@ -99,25 +91,25 @@ def home(request):
     if query:
        products = products.filter(name__icontains = query)
     
-    return render(request, 'home.html', {'products': products,})
+    return render(request, 'core/home.html', {'products': products,})
 
 
 #View-Product-Details-As-View-Details
 @login_required(login_url='login')
 def product_description(request, pk):
     item = Product.objects.get( pk =pk)
-    return render(request, 'product_description.html', {'item':item,})
+    return render(request, 'core/product_description.html', {'item':item,})
 
 
 #About-Page
 @login_required(login_url='login')
 def about(request):
-	return render(request, 'about.html')
+	return render(request, 'core/about.html')
 
 
 #Access-Denied-Page
 def no_permission(request):
-    return render(request, 'no_permission.html')
+    return render(request, 'core/no_permission.html')
 
 
 #Cart Functionality
@@ -127,7 +119,7 @@ temporary_cart = defaultdict(int)
 def add_to_cart(request, product_id):
     products = Product.objects.get(id=product_id)
     if products.available_count == 0:
-        return HttpResponse("Can't add")
+        messages.info(request, 'There is not Available stock for it.')
     if request.method == "POST":
         quantity = request.POST.get("count")
         if quantity is not None: 
@@ -145,7 +137,7 @@ def view_cart(request):
         for product_id, quantity in temporary_cart.items():
             product = Product.objects.get(pk=product_id)
             cart_items.append({'product': product, 'quantity': quantity})
-        return render(request, 'cart.html', {'cart_items':cart_items,})
+        return render(request, 'cart/cart.html', {'cart_items':cart_items,})
 
 
 #Remove-Cart
@@ -203,7 +195,7 @@ def update_quantity(request, product_id, quantity):
 #Return-Form-View
 def return_form(request):
     purchased_items = Log.objects.filter(user = request.user) 
-    return render(request, 'return_form.html', {'purchased_items':purchased_items,})
+    return render(request, 'cart/return_form.html', {'purchased_items':purchased_items,})
 
 #Return-All
 def return_all(request, item_id):
@@ -230,7 +222,7 @@ class AddWastageView(View):
         item = get_object_or_404(Log, id=item_id)
         return render(
             request,
-            'wastage.html',
+            'cart/wastage.html',
             {'categories': categories, 'products': products, 'item': item}
         )
 
@@ -261,7 +253,7 @@ class AddWastageView(View):
 
         return render(
             request,
-            'wastage.html',
+            'cart/wastage.html',
             {'categories': categories, 'products': products, 'item': item}
         )
         
@@ -273,7 +265,7 @@ class AddWastageView(View):
 @allowed_user(allowed_roles=['superadmin'])
 def users_list(request):
     users = User.objects.all()
-    return render(request, 'users.html', {'users': users})
+    return render(request, 'superadmin_view/users.html', {'users': users})
 
 
 #Super-Admin-Remove-The-Admin-Role
@@ -287,7 +279,7 @@ def remove_role(request, user_id):
         return redirect('users_list')
     else:
         pass
-    return redirect(request, 'users.html', {'user':user, } )
+    return redirect(request, 'superadmin_view/users.html', {'user':user, } )
 
 
 #Super-Admin-Apoint-Admin
@@ -300,18 +292,17 @@ def appoint_admin(request, user_id):
         return redirect('users_list')
     else:
         pass
-    return redirect(request, 'users.html', {'user':user, } )
+    return redirect(request, 'super_admin/users.html', {'user':user, } )
 
 
 #Log-For-Admin-SuperAdmin
-
-#Log-View-For-Admin-SuperAdmin
 @login_required(login_url='login')
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 def admin_view(request):
     log = Log.objects.all()
+    purchased_items = PurchasedItem.objects.all()
     checked_out = CheckedOutLog.objects.all()
-    return render(request, 'admin.html', {'log':log, 'checked_out':checked_out,})
+    return render(request, 'adminview/admin.html', {'log':log, 'checked_out':checked_out, 'purchased_items': purchased_items,})
 
 
 #Wastage-Record-View-For-Admin-SuperAdmin
@@ -319,7 +310,7 @@ def admin_view(request):
 @login_required(login_url='login')
 def wastage(request):
     wastage = Wastage.objects.all()
-    return render(request, 'wastage_render.html', {'wastage': wastage,})
+    return render(request, 'adminview/wastage_render.html', {'wastage': wastage,})
 
 
 #Add-Product-For-Admin-SuperAdmin
@@ -346,7 +337,7 @@ def add_product(request):
              sweetify.warning(request, 'Product added successfully',button="OK")
              return redirect("Add_product")
     
-   return render (request,"add_product.html",{"category":category})
+   return render (request,"adminview/add_product.html",{"category":category})
 
 
 #Add-Category-For-Admin-SuperAdmin
@@ -357,6 +348,6 @@ def add_category(request):
      if request.method == "POST":
          name = request.POST.get('name')
          Category.objects.create(name = name, created_by = request.user)
-     return render(request, 'add_category.html', {'categories': categories})
+     return render(request, 'adminview/add_category.html', {'categories': categories})
 
 
