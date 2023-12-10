@@ -47,7 +47,11 @@
                     <li class="nav-item"><a href="{% url 'wastage_render' %}" class="nav-link">Wastage</a></li>
                     <li class="nav-item"><a href="{% url 'Add_product' %}" class="nav-link">Add Products</a></li>
                     <li class="nav-item"><a href="{% url 'Add_category' %}" class="nav-link">Add Category</a></li>
+                    {% for group in request.user.groups.all %}
+                        {% if group.name == 'superadmin' %}
                     <li class="nav-item"><a href="{% url 'users_list' %}" class="nav-link">Add admin</a></li>
+                        {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
             <div class="card-body">
@@ -68,20 +72,38 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for i in log %}
+                                    {% for take in log %}
                                     <tr>
-                                        <td>{{i.user}}</td>
-                                        <td>{{i.product.name}}</td>
-                                        <td>{{i.quantity}}</td>
-                                        <td>{{i.created_at}}</td>
+                                        <td>{{take.user}}</td>
+                                        <td>{{take.product.name}}</td>
+                                        <td>{{take.quantity}}</td>
+                                        <td>{{take.created_at}}</td>
                                         <td>
-                                            {% if i.status == 'checked_out' %}
+                                            {% if take.status == 'checked_out' %}
                                             <span class="badge bg-danger">Checked out</span>
                                             {% else %}
                                             <span class="badge bg-success">Checked In</span>
                                             {% endif %}
                                         </td>
                                     </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                                <tbody>
+                                    {% for take_out in checked_out %}
+                                        <tr>
+                                            <td>{{take_out.user}}</td>
+                                            <td>{{take_out.product.name}}</td>
+                                            <td>{{take_out.quantity}}</td>
+                                            <td>{{take_out.created_at}}</td>
+                                            <td>
+                                                {% if take_out.status == 'checked_out' %}
+                                                <span class="badge bg-danger">Checked out</span>
+                                                {% else %}
+                                                <span class="badge bg-success">Checked In</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>

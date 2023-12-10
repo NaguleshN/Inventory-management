@@ -8,4 +8,4 @@ admin.site.register(Cart)
 admin.site.register(Log)
 admin.site.register(Wastage)
 admin.site.register(PurchasedItem)
-
+admin.site.register(CheckedOutLog)

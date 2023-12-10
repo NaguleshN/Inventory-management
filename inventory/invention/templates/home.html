@@ -48,10 +48,18 @@
                           <td>{{ product.category }}</td>
                           <td>
                           <a href="{% url 'Product_description' product.id %}" class="text-decoration-none text-black"><button class="btn btn-outline-primary">View Detail</button> </a></td>
-                          </td> 
+
+                        </td>
                           <td>
                             <form action="{% url 'add_to_cart' product.id %}" method="post">
                             {% csrf_token%}
+                            <div class="input-group">
+                              <input type="number" onkeydown="sayhello()" class="form-control" min="0" value="0" name="count">
+                              <span class="input-group-btn">
+                                <button class="btn btn-outline-primary" type="button" onclick="increment(this)">+</button>
+                                <button class="btn btn-outline-primary" type="button" onclick="decrement(this)">-</button>
+                              </span>
+                            </div>
                             <button class="btn btn-outline-primary" type="submit">ADD</button>
                             </form>
                           </td>
@@ -59,45 +67,26 @@
                         {% endfor %}
                       </tbody>
                     </table>
-                   
+                    <script>
+                      //window.addEventListener('submit',(e)=>{
+                     // e.preventDefault()
+                     // console.log(e.formData)})
+                    function sayhello(){
+                      console.log('he llo')
+                    }
+                      function increment(button) {
+                        const inputField = button.parentNode.parentNode.querySelector('input[type="number"]');
+                        inputField.value = parseInt(inputField.value)+1;
+                      } 
+                    
+                      function decrement(button) {
+                        const inputField = button.parentNode.parentNode.querySelector('input[type="number"]');
+                        inputField.stepDown();
+                      }
+
+                    </script>
                   </div>
                 </div>
               </div> 
             </div>
-            <!-- <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    // Fetch initial counts for products
-                    document.querySelectorAll('.productCount').forEach(cell => {
-                        const productId = cell.getAttribute('data-product-id');
-                        fetch(`/get_product_count/${productId}`) // Replace with your Django URL to get the product count
-                            .then(response => response.json())
-                            .then(data => {
-                                cell.textContent = data.count; // Update the count for the specific product
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                            });
-                    });
-                
-                    // Handle form submission and update count
-                    document.querySelectorAll('form').forEach(form => {
-                        form.addEventListener('submit', function(event) {
-                            event.preventDefault(); // Prevent the default form submission
-                
-                            const productId = this.getAttribute('id').split('_')[1]; // Extract the product ID
-                            const url = this.getAttribute('action');
-                
-                            fetch(url, { method: 'POST', body: new FormData(this) })
-                                .then(response => response.json())
-                                .then(data => {
-                                    const countCell = document.querySelector(`.productCount[data-product-id="${productId}"]`);
-                                    countCell.textContent = data.count; // Update the count for the specific product
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                });
-                        });
-                    });
-                });
-                </script>    -->
 {% endblock %}

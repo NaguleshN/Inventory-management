@@ -44,7 +44,7 @@ class Cart(models.Model):
 
 
 class Wastage(models.Model):
-    roll_number=models.CharField(max_length=8)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     product_name=models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField()
     reason=models.TextField()
@@ -52,7 +52,7 @@ class Wastage(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.roll_number 
+        return str(self.user) 
 
 
 class PurchasedItem(models.Model):
@@ -66,6 +66,16 @@ class PurchasedItem(models.Model):
 
     
 class Log(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
+
+    def _str_(self):
+        return str(self.product)
+
+class CheckedOutLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)

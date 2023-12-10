@@ -11,8 +11,10 @@ from .decorators import *
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, JsonResponse
 from collections import defaultdict
+from django.views import View
 
 
+#Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
     allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in','paramasivan.22mc@kct.ac.in']
     if user and user.email not in allowed_emails:
@@ -24,101 +26,8 @@ def custom_forbidden(request):
         return render(request, 'login.html')
     return render(request, 'custom_forbidden.html')
 
-@login_required(login_url= 'login')
-@allowed_user(allowed_roles=['student_user','admin', 'superadmin'])
-def home(request):
-    if len(request.user.username)>9:
-        user = get_object_or_404(User, id=request.user.id)
-        admin_group = Group.objects.get(name='admin') 
-        user.groups.add(admin_group)
-        # return redirect('admin_views')
-    products = Product.objects.all()
-    purchased_items = PurchasedItem.objects.filter(user = request.user)
-    cart_items = Cart.objects.all()
-    query = request.GET.get('query', '')
-    if query:
-       products = products.filter(name__icontains = query)
-    
 
-    return render(request, 'home.html', {'products': products,})
-
-
-@login_required(login_url='login')
-def about(request):
-	return render(request, 'about.html')
-
-@login_required(login_url='login')
-def logs(request):
-	return render(request, 'logs.html')
-
-
-#Product Details
-@allowed_user(allowed_roles=(['admin', 'superadmin']))
-@login_required(login_url='login')
-def add_product(request):
-   category=Category.objects.all()
-   if request.method=="POST" and request.FILES.get('image'):
-         product_name=request.POST.get("name")
-         decription=request.POST.get("description")
-         actual_count=request.POST.get("actual")
-         available_count=request.POST.get("avail")
-         img=request.FILES["image"]   
-         cat=request.POST.get("category")
-         category=Category.objects.get(name=cat)
-         print(actual_count)
-         print(available_count)
-         if int(actual_count) >= int(available_count):
-            print("exec add product")
-            Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img, dummy_count = available_count)
-            sweetify.success(request, 'Look Up the Available Quantity',button="OK")
-            return redirect("Add_product")
-         else:
-             sweetify.warning(request, 'Product added successfully',button="OK")
-             return redirect("Add_product")
-    
-   return render (request,"add_product.html",{"category":category})
-
-
-@allowed_user(allowed_roles=['admin', 'superadmin'])
-@login_required(login_url='login')
-def add_category(request):
-     categories = Category.objects.all()
-     if request.method == "POST":
-         name = request.POST.get('name')
-         Category.objects.create(name = name, created_by = request.user)
-     return render(request, 'add_category.html', {'categories': categories})
-
-
-@login_required(login_url='login')
-def add_wastage(request):
-    categories=Category.objects.all()
-    products = Product.objects.all()
-    if request.method == "POST":
-       product = request.POST.get('product_name')
-       product_name = Product.objects.get(name = product) 
-       roll_number = request.POST.get('roll_number')
-       quantity = request.POST.get('quantity')
-       reason = request.POST.get('reason')
-    #    cat=request.POST.get("category")
-       p=Product.objects.filter(name=product_name)
-       for i in p:
-        category=i.category
-    #    category=Category.objects.get(name=cat)
-       Wastage.objects.create(product_name=product_name,
-                              roll_number=roll_number,
-                              quantity=quantity,
-                              reason=reason,
-                              category=category,
-                              )   
-    return render(request, 'wastage.html', {'category':categories,
-      'products':products,})
-
-@login_required(login_url='login')
-def product_description(request, pk):
-    # item = get_object_or_404(Product, pk =pk)
-    item = Product.objects.get( pk =pk)
-    return render(request, 'product_description.html', {'item':item,})
-
+#Login-And-Register
 @unauthenticated_user
 def login(request):
     if request.user.is_authenticated:
@@ -147,7 +56,7 @@ def login(request):
     return render(request,'login.html')
 
 @unauthenticated_user
-def register(request):
+def signup(request):
     details=User.objects.all()   
     if request.user.is_authenticated:
         return redirect('Home')
@@ -158,8 +67,6 @@ def register(request):
                  
         if re.match(pattern, rollno):
             password='iqube@kct'
-            print(rollno)
-            print(password)
             user = User.objects.create_user(username=rollno,password=password)
             user=auth.authenticate(username=rollno,password=password)
             
@@ -175,50 +82,64 @@ def register(request):
                 
     return render(request, 'register.html')
 
+
+#Home-Page
+@login_required(login_url= 'login')
+@allowed_user(allowed_roles=['student_user','admin', 'superadmin'])
+def home(request):
+    if len(request.user.username)>9:
+        user = get_object_or_404(User, id=request.user.id)
+        admin_group = Group.objects.get(name='admin') 
+        user.groups.add(admin_group)
+        # return redirect('admin_views')
+    products = Product.objects.all()
+    purchased_items = PurchasedItem.objects.filter(user = request.user)
+    cart_items = Cart.objects.all()
+    query = request.GET.get('query', '')
+    if query:
+       products = products.filter(name__icontains = query)
+    
+    return render(request, 'home.html', {'products': products,})
+
+
+#View-Product-Details-As-View-Details
+@login_required(login_url='login')
+def product_description(request, pk):
+    item = Product.objects.get( pk =pk)
+    return render(request, 'product_description.html', {'item':item,})
+
+
+#About-Page
+@login_required(login_url='login')
+def about(request):
+	return render(request, 'about.html')
+
+
+#Access-Denied-Page
+def no_permission(request):
+    return render(request, 'no_permission.html')
+
+
+#Cart Functionality
+
+#Add-To-Cart
 temporary_cart = defaultdict(int)
-
 def add_to_cart(request, product_id):
-    products = Product.objects.get(id = product_id)
+    products = Product.objects.get(id=product_id)
     if products.available_count == 0:
-        return HttpResponse("Cann't add")
-    quantity = 1  # Replace with actual quantity from user input
-    temporary_cart[product_id] += quantity
-    return redirect('Home')
-    # return render(request, 'home.html', {'products':products,})
+        return HttpResponse("Can't add")
+    if request.method == "POST":
+        quantity = request.POST.get("count")
+        if quantity is not None: 
+            try:
+                quantity_int = int(quantity)
+                temporary_cart[product_id] += quantity_int
+            except ValueError:
+                return HttpResponse("Invalid quantity")
+        return redirect('Home')
 
 
-# @login_required
-# def add_to_cart(request,product_id):
-#     product = Product.objects.get(id=product_id)
-#     cart_item ,created= Cart.objects.get_or_create(product_name=product,created_by=request.user)
-#     cart_item.quantity += 1
-#     cart_item.save()
-#     return redirect('Home')
-
-def remove_from_cart(request, product_id):
-    if product_id in temporary_cart:
-        if temporary_cart[product_id] > 0:
-                del temporary_cart[product_id]
-    return redirect('view_cart')
-
-def decrease_quantity(request, product_id):
-  
-    if product_id in temporary_cart:
-        temporary_cart[product_id] -= 1
-        if temporary_cart[product_id] == 0:
-            del temporary_cart[product_id]
-    return redirect('view_cart')
-
-def increase_quantity(request, product_id):
-
-    if product_id in temporary_cart:
-        product = Product.objects.get(pk=product_id)
-        if product.available_count > temporary_cart[product_id]:
-            temporary_cart[product_id] += 1
-    return redirect('view_cart')
-
-
-# cart
+#View-Cart
 def view_cart(request):
         cart_items = []
         for product_id, quantity in temporary_cart.items():
@@ -226,20 +147,46 @@ def view_cart(request):
             cart_items.append({'product': product, 'quantity': quantity})
         return render(request, 'cart.html', {'cart_items':cart_items,})
 
-def submit_cart(request):
 
-    print("Hii")
+#Remove-Cart
+def remove_from_cart(request, product_id):
+    if product_id in temporary_cart:
+        if temporary_cart[product_id] > 0:
+                del temporary_cart[product_id]
+    return redirect('view_cart')
+
+
+#Submit-In-Cart
+def submit_cart(request):
     for product_id, quantity in temporary_cart.items():
         product = Product.objects.get(pk=product_id)
         if product.available_count >= quantity:
-            print(product)
-            print(quantity)
             product.available_count -= quantity
             product.save()
             PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user)
             Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in")
     temporary_cart.clear()
     return redirect("Home")
+
+
+#Optional-Cart-Quantity
+def decrease_quantity(request, product_id):
+    if product_id in temporary_cart:
+        temporary_cart[product_id] -= 1
+        if temporary_cart[product_id] == 0:
+            del temporary_cart[product_id]
+    return redirect('view_cart')
+
+
+
+def increase_quantity(request, product_id):
+    if product_id in temporary_cart:
+        product = Product.objects.get(pk=product_id)
+        if product.available_count > temporary_cart[product_id]:
+            temporary_cart[product_id] += 1
+    return redirect('view_cart')
+
+
 
 def update_quantity(request, product_id, quantity):
     product = get_object_or_404(Product, id=product_id)
@@ -252,66 +199,84 @@ def update_quantity(request, product_id, quantity):
         return JsonResponse({'success': False})
     
 
-# @login_required
-# def view_cart(request):
-#     cart_items = Cart.objects.filter(created_by=request.user)
-#     if request.method=="POST":
-#         for i in cart_items:
-#             cart_item, created = PurchasedItem.objects.get_or_create(product=i.product_name,quantity=i.quantity, user=request.user)
-#             cart_item.quantity =i.quantity
-#             cart_item.save()
-#             x = datetime.now()
-#             log_item = Log.objects.create(product = i.product_name, user=request.user, quantity = i.quantity, created_at = x, status = 'checked_in')
-#             Cart.objects.filter(product_name=i.product_name).delete()
-#         return redirect("Home")
 
-#     return render(request,'cart.html',{'cart_items': cart_items,})
+#Return-Form-View
+def return_form(request):
+    purchased_items = Log.objects.filter(user = request.user) 
+    return render(request, 'return_form.html', {'purchased_items':purchased_items,})
 
+#Return-All
+def return_all(request, item_id):
+    item = get_object_or_404(Log, pk=item_id)
+    product = item.product
 
+    item.status = 'checked_in'
+    item.save()
 
-# @login_required
-# def remove_from_cart(request,item_id):
-#     cart_item = Product.objects.get(id=item_id)
-#     cart_item.delete()
-#     return redirect('Home')
+    CheckedOutLog.objects.create(product=product,quantity=item.quantity,user=request.user,status="checked_out")
+    product.available_count += item.quantity
+    product.save()
 
+    item.delete()
+
+    return redirect('return_form')
 
 
+#Damaged-Form
+class AddWastageView(View):
+    def get(self, request, item_id):
+        categories = Category.objects.all()
+        products = Log.objects.all()
+        item = get_object_or_404(Log, id=item_id)
+        return render(
+            request,
+            'wastage.html',
+            {'categories': categories, 'products': products, 'item': item}
+        )
+
+    def post(self, request, item_id):
+        categories = Category.objects.all()
+        products = Log.objects.all()
+        item = get_object_or_404(Log, id=item_id)
+
+        damaged_quantity = request.POST.get("damaged_qty")
+        reason = request.POST.get("reason")
+
+        if damaged_quantity is not None and damaged_quantity.isdigit() and int(damaged_quantity) <= item.quantity and int(damaged_quantity) > 0:
+            damaged_quantity = int(damaged_quantity)
+            item.quantity -= damaged_quantity
+           
+        
+            item.save()
+
+            Wastage.objects.create(user=request.user,product_name=item.product,quantity=damaged_quantity,reason=reason,category=item.product.category)
+            if item.quantity == 0:
+                item.delete()
+                return redirect('return_form')
+            if item:
+                return redirect('return_form')
+            
+        else:
+            messages.warning(request, 'You have to Look up the quantity')
+
+        return render(
+            request,
+            'wastage.html',
+            {'categories': categories, 'products': products, 'item': item}
+        )
+        
+        
+#User-Groups
+
+#Super-Admin-Only-view
 @login_required(login_url='login')
-@allowed_user(allowed_roles=['admin', 'superadmin'])
-def admin_view(request):
-    log = Log.objects.all()
-    return render(request, 'admin.html', {'log':log,})
-
-
-
-
-@allowed_user(allowed_roles=(['admin', 'superadmin']))
-@login_required(login_url='login')
-def wastage(request):
-    wastage = Wastage.objects.all()
-    return render(request, 'wastage_render.html', {'wastage': wastage,})
-
-def no_permission(request):
-    return render(request, 'no_permission.html')
-
-
-
-
 @allowed_user(allowed_roles=['superadmin'])
-def appoint_admin(request, user_id):
-    if request.method == 'POST':
-        user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='admin') 
-        user.groups.add(admin_group)
-        return redirect('users_list')
-    else:
-        pass
-    return redirect(request, 'users.html', {'user':user, } )
+def users_list(request):
+    users = User.objects.all()
+    return render(request, 'users.html', {'users': users})
 
 
-
-
+#Super-Admin-Remove-The-Admin-Role
 @login_required(login_url='login')
 @allowed_user(allowed_roles=['superadmin'])
 def remove_role(request, user_id):
@@ -325,10 +290,73 @@ def remove_role(request, user_id):
     return redirect(request, 'users.html', {'user':user, } )
 
 
-
-    
-@login_required(login_url='login')
+#Super-Admin-Apoint-Admin
 @allowed_user(allowed_roles=['superadmin'])
-def users_list(request):
-    users = User.objects.all()
-    return render(request, 'users.html', {'users': users})
+def appoint_admin(request, user_id):
+    if request.method == 'POST':
+        user = get_object_or_404(User, id=user_id)
+        admin_group = Group.objects.get(name='admin') 
+        user.groups.add(admin_group)
+        return redirect('users_list')
+    else:
+        pass
+    return redirect(request, 'users.html', {'user':user, } )
+
+
+#Log-For-Admin-SuperAdmin
+
+#Log-View-For-Admin-SuperAdmin
+@login_required(login_url='login')
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+def admin_view(request):
+    log = Log.objects.all()
+    checked_out = CheckedOutLog.objects.all()
+    return render(request, 'admin.html', {'log':log, 'checked_out':checked_out,})
+
+
+#Wastage-Record-View-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=(['admin', 'superadmin']))
+@login_required(login_url='login')
+def wastage(request):
+    wastage = Wastage.objects.all()
+    return render(request, 'wastage_render.html', {'wastage': wastage,})
+
+
+#Add-Product-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=(['admin', 'superadmin']))
+@login_required(login_url='login')
+def add_product(request):
+   category=Category.objects.all()
+   if request.method=="POST" and request.FILES.get('image'):
+         product_name=request.POST.get("name")
+         decription=request.POST.get("description")
+         actual_count=request.POST.get("actual")
+         available_count=request.POST.get("avail")
+         img=request.FILES["image"]   
+         cat=request.POST.get("category")
+         category=Category.objects.get(name=cat)
+         print(actual_count)
+         print(available_count)
+         if int(actual_count) >= int(available_count):
+            print("exec add product")
+            Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img, dummy_count = available_count)
+            sweetify.success(request, 'Look Up the Available Quantity',button="OK")
+            return redirect("Add_product")
+         else:
+             sweetify.warning(request, 'Product added successfully',button="OK")
+             return redirect("Add_product")
+    
+   return render (request,"add_product.html",{"category":category})
+
+
+#Add-Category-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def add_category(request):
+     categories = Category.objects.all()
+     if request.method == "POST":
+         name = request.POST.get('name')
+         Category.objects.create(name = name, created_by = request.user)
+     return render(request, 'add_category.html', {'categories': categories})
+
+
