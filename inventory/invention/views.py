@@ -81,8 +81,6 @@ def home(request):
         user.groups.add(admin_group)
 
     products = Product.objects.all()
-    purchased_items = PurchasedItem.objects.filter(user = request.user)
-    cart_items = Cart.objects.all()
     query = request.GET.get('query', '')
     if query:
        products = products.filter(name__icontains = query)
@@ -121,7 +119,7 @@ def add_to_cart(request, product_id):
         if quantity is not None: 
             try:
                 quantity_int = int(quantity)
-                if quantity_int <= products.available_count:
+                if quantity_int <= products.available_count and quantity_int != 0:
                     temporary_cart[product_id] += quantity_int
                 else:
                     messages.warning(request, "Don't give extra quantity.")
