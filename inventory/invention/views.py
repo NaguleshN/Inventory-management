@@ -35,10 +35,6 @@ def login(request):
     
     if request.method=='POST':
         rollno=request.POST.get('rollno')
-
-        # pattern = r'^\d{2}[A-Z]{3}\d{3}$'
-                    
-        # if re.match(pattern, rollno):
         password="iqube@kct"
         print(rollno)
         print(password)
@@ -83,7 +79,7 @@ def home(request):
         user = get_object_or_404(User, id=request.user.id)
         admin_group = Group.objects.get(name='admin') 
         user.groups.add(admin_group)
-        # return redirect('admin_views')
+
     products = Product.objects.all()
     purchased_items = PurchasedItem.objects.filter(user = request.user)
     cart_items = Cart.objects.all()
@@ -125,7 +121,10 @@ def add_to_cart(request, product_id):
         if quantity is not None: 
             try:
                 quantity_int = int(quantity)
-                temporary_cart[product_id] += quantity_int
+                if quantity_int <= products.available_count:
+                    temporary_cart[product_id] += quantity_int
+                else:
+                    messages.warning(request, "Don't give extra quantity.")
             except ValueError:
                 return HttpResponse("Invalid quantity")
         return redirect('Home')
@@ -155,8 +154,8 @@ def submit_cart(request):
         if product.available_count >= quantity:
             product.available_count -= quantity
             product.save()
-            PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user)
-            Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in")
+            PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.now() )
+            Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.now())
     temporary_cart.clear()
     return redirect("Home")
 

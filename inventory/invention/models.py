@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import F
 from django.contrib.auth.models import User
+from datetime import timezone
+import datetime
+# from datetime.timezone import tz
 
 class Product(models.Model):
     name=models.CharField(max_length=255)
@@ -12,10 +15,6 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='images')
 
-    # def update_available_count(self, quantity):
-    #     # Update available_count using F() expressions to ensure concurrency safety
-    #     self.available_count = F('available_count') - quantity
-    #     self.save(update_fields=['available_count'])
 
     def __str__(self):
         return self.name
@@ -36,7 +35,7 @@ temporary_cart = {}
 class Cart(models.Model):
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField(default=0)
-    due_date=models.DateTimeField(auto_now=True)
+    due_date=models.DateTimeField(default=datetime.datetime.now())
     created_by=models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
@@ -49,7 +48,7 @@ class Wastage(models.Model):
     quantity=models.PositiveIntegerField()
     reason=models.TextField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return str(self.user) 
@@ -59,7 +58,7 @@ class PurchasedItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_added = models.DateTimeField(auto_now_add=True) 
+    date_added = models.DateTimeField(default=datetime.datetime.now()) 
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     
     def _str_(self):
@@ -70,9 +69,9 @@ class Log(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now())
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
-
+    acting = models.CharField(max_length=20, default="hi")
     def _str_(self):
         return str(self.product)
 
@@ -80,7 +79,7 @@ class CheckedOutLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now())
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
 
     def _str_(self):
