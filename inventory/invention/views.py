@@ -16,14 +16,22 @@ from django.views import View
 
 #Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
-    allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in','paramasivan.22mc@kct.ac.in']
+    email=AdminMail.objects.all()
+    allowed_emails = ['nagulesh.22cs@kct.ac.in']
+    for e in email:
+        allowed_emails.append(e.mail)
+        
+    for i in allowed_emails:
+        print(i)
+    # group = Group.objects.get(name='admin')
+    # user.group.add('admin')
     if user and user.email not in allowed_emails:
         return redirect('custom_forbidden')
     return {'details': details, 'user': user, 'is_new': is_new}
 
 def custom_forbidden(request):
     if request.method=="POST":
-        return render(request, 'login.html')
+        return redirect('login')
     return render(request, 'custom_forbidden.html')
 
 
@@ -262,34 +270,48 @@ class AddWastageView(View):
 @allowed_user(allowed_roles=['superadmin'])
 def users_list(request):
     users = User.objects.all()
-    return render(request, 'superadmin_view/users.html', {'users': users})
+    admins=AdminMail.objects.all()
+    pattern= r"^[a-zA-Z0-9_.]+@(kct\.)+(ac\.)+in$"
+    if request.method=="POST":
+        email=request.POST.get("email")
+        print(email)
+        if re.match(pattern,email):
+            print("valid")
+            for i in admins:
+                if email==i.mail:
+                    sweetify.warning(request, 'Microsoft mail-id already exists ',button="OK")
+                    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
+            AdminMail.objects.create(mail=email)
+
+
+    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
 
 
 #Super-Admin-Remove-The-Admin-Role
-@login_required(login_url='login')
-@allowed_user(allowed_roles=['superadmin'])
-def remove_role(request, user_id):
-    if request.method == 'POST':
-        user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='admin') 
-        user.groups.remove(admin_group)
-        return redirect('users_list')
-    else:
-        pass
-    return redirect(request, 'superadmin_view/users.html', {'user':user, } )
+# @login_required(login_url='login')
+# @allowed_user(allowed_roles=['superadmin'])
+# def remove_role(request, user_id):
+#     if request.method == 'POST':
+#         user = get_object_or_404(User, id=user_id)
+#         admin_group = Group.objects.get(name='admin') 
+#         user.groups.remove(admin_group)
+#         return redirect('users_list')
+#     else:
+#         pass
+#     return redirect(request, 'superadmin_view/users.html', {'user':user, } )
 
 
 #Super-Admin-Apoint-Admin
-@allowed_user(allowed_roles=['superadmin'])
-def appoint_admin(request, user_id):
-    if request.method == 'POST':
-        user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='admin') 
-        user.groups.add(admin_group)
-        return redirect('users_list')
-    else:
-        pass
-    return redirect(request, 'super_admin/users.html', {'user':user, } )
+# @allowed_user(allowed_roles=['superadmin'])
+# def appoint_admin(request, user_id):
+#     if request.method == 'POST':
+#         user = get_object_or_404(User, id=user_id)
+#         admin_group = Group.objects.get(name='admin') 
+#         user.groups.add(admin_group)
+#         return redirect('users_list')
+#     else:
+#         pass
+#     return redirect(request, 'super_admin/users.html', {'user':user, } )
 
 
 #Log-For-Admin-SuperAdmin

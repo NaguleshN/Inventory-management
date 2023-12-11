@@ -32,8 +32,8 @@ urlpatterns = [
 
     #superadmin
     path('users/', views.users_list, name='users_list'),
-    path('appoint_admin/<int:user_id>/', views.appoint_admin, name='appoint_admin'),
-    path('remove_role/<int:user_id>/', views.remove_role, name='remove_role'),
+    # path('appoint_admin/<int:user_id>/', views.appoint_admin, name='appoint_admin'),
+    # path('remove_role/<int:user_id>/', views.remove_role, name='remove_role'),
 
     #cart
     path('cart/', views.view_cart, name='view_cart'),

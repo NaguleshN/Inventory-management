@@ -5,7 +5,40 @@
     <h1 class="text-center mb-4">Inventory Users List</h1>
     <div class="row justify-content-center my-5">
         <div class="col-md-10">
+            <form name="myForm" onsubmit="return validateForm()" method="post">
+                {% csrf_token %}
+            <input type="text" id="email" name="email" placeholder="admin@kct.ac.in" pattern= "[a-zA-Z0-9_.+-]+@kct\.ac\.in"  required>
+            <button onclick="validateEmail()" type="submit" >Submit</button>
+            <p id="result" ></p>
+
+            </form>
+            {% for i in admins %}
+            <p id="mail" class="mail">{{i.mail}}</p>
+            {% endfor %}
+
+            <script>
+                function validateEmail() {
+                  var emailInput = document.getElementById("email").value;
+                  var emailPattern = /^[a-zA-Z0-9_.]+@(kct\.)+(ac\.)+in$/;
+                  if (emailPattern.test(emailInput)) {
+                    document.getElementById("result").innerText = "Valid Microsoft email!";
+                    return True;
+                  } else {
+                    //document.getElementById("result").innerText = "Invalid email or not a Microsoft email.";
+                    alert("Invalid email or not a Microsoft email.")
+                  }
+                }
+
+                
+            </script>
+            
+            
+            {% comment %}
             <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for i in admins %}
+            <p id="mail" class="mail">{{i.mail}}</p>
+            {% endfor %}
+            
                 {% for user in users %}
                 <div class="col">
                     <div class="card">
@@ -16,6 +49,7 @@
                                 <span class="badge bg-primary">{{ group.name }}</span>
                                 {% endfor %}
                             </p>
+
                             <div class="row">
                                 <div class="col">
                                     <form action="{% url 'appoint_admin' user.id %}" method="post">
@@ -33,8 +67,9 @@
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                {% endfor %} 
             </div>
+            {% endcomment %}
         </div>
     </div>
 </div>

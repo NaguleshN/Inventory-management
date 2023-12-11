@@ -61,7 +61,7 @@
         <p>Sorry, you do not have permission to view this page.</p>
         <form method="POST" >
             {% csrf_token %}
-        {% comment %} <a href="{% url 'Home' %}" class="link-btn">Back to Home</a> {% endcomment %}
+        {% comment %} <a href="{% url 'login' %}" class="link-btn">Back to Home</a> {% endcomment %}
         <button type="submit" class="link-btn">Return to login</button>
         </form>
     </div>
