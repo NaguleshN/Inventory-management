@@ -41,6 +41,7 @@
           <h5 class="card-title">{{ product.name }}</h5>
           <p class="card-text">Actual Quantity: {{ product.actual_count }}</p>
           <p class="card-text">Available Quantity: {{ product.available_count }}</p>
+          <p class="card-text">Dummy Quantity: {{ product.dummy_count }}</p>
           <p class="card-text">Category: {{ product.category }}</p>
           <a href="{% url 'Product_description' product.id %}" class="btn btn-outline-primary">View Detail</a>
           <form action="{% url 'add_to_cart' product.id %}" method="post" class="mt-3">
