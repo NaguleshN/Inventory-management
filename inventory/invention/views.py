@@ -1,6 +1,5 @@
 import re
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import auth
 from django.contrib import messages
 from django.shortcuts import render,redirect, get_object_or_404
 from .models import *
@@ -12,7 +11,34 @@ from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, JsonResponse
 from collections import defaultdict
 from django.views import View
+from django.contrib.auth.models import User, auth
+from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from .tasks import send_notification_mail
+from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
+from django.http import HttpResponse
+from .tasks import send_notification_mail
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
+# Create your views here.
+def send_mail_to_all(request):
+  send_mail_func.delay()
+  return HttpResponse("Sent")
+
+# def schedule_mail(request):
+#   schedule, created = CrontabSchedule.objects.get_or_create(hour = 18, minute = 30)
+#   task = PeriodicTask.objects.create(crontab=schedule, name="schedule_mail_task_"+"1", task="mail.tasks.send_mail_func" )
+#   return HttpResponse("Done")
+
+  
+def form_valid(self, form):
+        email = form.cleaned_data["email"]
+        message = form.cleaned_data["message"]
+        send_notification_mail.delay(email,message)
+        return HttpResponse('We have sent you a confirmation mail!')
 
 #Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):

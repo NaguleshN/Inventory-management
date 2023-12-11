@@ -58,7 +58,7 @@ class PurchasedItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_added = models.DateTimeField(default=datetime.datetime.now()) 
+    date_added = models.DateTimeField() 
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     
     def _str_(self):
