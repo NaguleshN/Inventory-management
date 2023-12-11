@@ -4,7 +4,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
-from .views import return_form, AddWastageView
+from .views import return_form, AddWastageView, AddReturnView
 
 urlpatterns = [
     #authentication
@@ -48,6 +48,7 @@ urlpatterns = [
     path('return_form/', views.return_form, name="return_form"),
     path('return_all/<int:item_id>/', views.return_all, name='return_all'),
     path('add_wastage/<int:item_id>/', AddWastageView.as_view(), name="Add_wastage"),
+    path('return/<int:item_id>/', AddReturnView.as_view(), name="return"),
 ]
 
 if settings.DEBUG:
