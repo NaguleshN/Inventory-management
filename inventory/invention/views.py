@@ -187,14 +187,12 @@ def decrease_quantity(request, product_id):
     return redirect('view_cart')
 
 
-
 def increase_quantity(request, product_id):
     if product_id in temporary_cart:
         product = Product.objects.get(pk=product_id)
         if product.available_count > temporary_cart[product_id]:
             temporary_cart[product_id] += 1
     return redirect('view_cart')
-
 
 
 def update_quantity(request, product_id, quantity):
@@ -205,8 +203,7 @@ def update_quantity(request, product_id, quantity):
         updated_available_quantity = product.available_count
         return JsonResponse({'success': True, 'updatedAvailableQuantity': updated_available_quantity})
     else:
-        return JsonResponse({'success': False})
-    
+        return JsonResponse({'success': False})  
 
 
 #Return-Form-View
@@ -348,23 +345,17 @@ def users_list(request):
                     sweetify.warning(request, 'Microsoft mail-id already exists ',button="OK")
                     return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
             AdminMail.objects.create(mail=email)
-
-
+        users = User.objects.all()
+        return redirect('users_list')
     return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
 
 
 #Super-Admin-Remove-The-Admin-Role
-# @login_required(login_url='login')
-# @allowed_user(allowed_roles=['superadmin'])
-# def remove_role(request, user_id):
-#     if request.method == 'POST':
-#         user = get_object_or_404(User, id=user_id)
-#         admin_group = Group.objects.get(name='admin') 
-#         user.groups.remove(admin_group)
-#         return redirect('users_list')
-#     else:
-#         pass
-#     return redirect(request, 'superadmin_view/users.html', {'user':user, } )
+
+def remove_role(request, user_id):
+    emails=AdminMail.objects.all()
+    AdminMail.objects.filter(id=user_id).delete()
+    return redirect('users_list')
 
 
 #Super-Admin-Apoint-Admin

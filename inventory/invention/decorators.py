@@ -17,12 +17,8 @@ def allowed_user(allowed_roles = []):
             mail=AdminMail.objects.all()
             p=0
             for i in mail:
-                
                 if request.user.email==i.mail:
-                # if request.user.email=="nagulesh.22cs@kct.ac.in":
-                # if i.mail=="nagulesh.22cs@kct.ac.in":
                     p=10
-                    
                     
             if request.user.groups.exists():
                 group = request.user.groups.all()[0].name
