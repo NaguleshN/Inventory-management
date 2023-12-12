@@ -18,7 +18,21 @@
             top:80px;
         }
     </style>
-        
+    <script>
+        function checkCategory() {
+
+            var categoryName = document.getElementById('exampleInputEmail1').value;
+  
+            var existingCategories = [{% for category in categories %}"{{ category.name }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
+    
+
+            if (existingCategories.includes(categoryName)) {
+                alert('Category already exists!');
+                return false;
+            }
+            return true;
+        }
+    </script>
 <head>
 <body>
     <div class="container mb-5 mt-5" style="display:flex;justify-content:center;align-items:center">
@@ -28,17 +42,17 @@
                 <img src="{% static 'images\10yearslogo_1-1-1_page-0001-removebg-preview.png' %}" alt="">
             </div>
           <div class="col p-4 d-flex flex-column position-static" >
-            <form method="POST">
-                {% csrf_token%}
+            <form method="POST" onsubmit="return checkCategory()">
+                {% csrf_token %}
                 <center><h1 style="font-style:Serif" class="mb-5">ADD CATEGORY </h1></center>
                 <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Category Name</label>
-                  <input type="text" class="form-control" id="exampleInputEmail1"name="name">
+                    <label for="exampleInputEmail1" class="form-label">Category Name</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" name="name">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
-          </div>
-          
+            </form>
+            
+          </div> 
         </div>
     </div>
     </div>

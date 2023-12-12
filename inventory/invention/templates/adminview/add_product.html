@@ -18,7 +18,6 @@
             top:80px;
         }
     </style>
-        
 <head>
 <body>
     <div class="container mt-5 mb-5" style="display:flex;justify-content:center;align-items:center">
@@ -28,7 +27,7 @@
                 <img src="{% static 'images\10yearslogo_1-1-1_page-0001-removebg-preview.png' %}" alt="" weight>
                </div>
           <div class="col p-4 d-flex flex-column position-static" >
-            <form method="POST" enctype="multipart/form-data" >
+
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token%}
                 
@@ -53,24 +52,24 @@
                 
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Actual Quantity</label>
-                    <input type="number" class="form-control" id="exampleInputEmail1" name="actual">
+                    <input type="number" class="form-control" min="0" value="0" id="exampleInputEmail1" name="actual" required>
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Available Quantity</label>
-                    <input type="number" class="form-control" id="exampleInputEmail1"  name="avail">
+                    <input type="number" min="0" value="0" class="form-control" id="exampleInputEmail1"  name="avail" required>
                   </div>
                   <div class="mb-3">
                     <label for="select" class="form-label">Category</label>
-                    <select  class="form-select" id="select" name="category"> 
+                    <select  class="form-select" id="select" name="category" required> 
                       <option disabled selected>--SELECT--</option>
-                      {% for i in category%}
+                      {% for i in category  %}
                         <option value="{{i.name}}">{{i.name}}</option>
                         {% endfor %}
                     </select>
                   </div>
                   <div class="mb-3">
                     <label for="img" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="img"  name="image">
+                    <input type="file" class="form-control" id="img"  name="image" required>
                   </div>
                  
 
@@ -82,6 +81,38 @@
         </div>
     </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const form = document.querySelector('form');
+  
+          form.addEventListener('submit', function(event) {
+              event.preventDefault();
+  
+              const actualQuantity = parseInt(document.querySelector('input[name="actual"]').value);
+              const availableQuantity = parseInt(document.querySelector('input[name="avail"]').value);
+  
+              if (actualQuantity <= 0 || availableQuantity <= 0) {
+                  alert('OOPS!! Quantity should not be Zero.');
+                  return;
+              }
+  
+              if (availableQuantity > actualQuantity) {
+                  alert('Check the quantity you have given.');
+                  return;
+              }
+  
+              const productName = document.querySelector('input[name="name"]').value;
+              const existingProducts = [{% for product in products %}"{{ product.name }}"{% if not forloop.last %}, {% endif %}{% endfor %}];
+  
+              if (existingProducts.includes(productName)) {
+                  alert('Product name already exists!');
+                  return;
+              }
+ 
+              form.submit();
+          });
+      });
+  </script>
 </body>
 
 {% endblock %}
