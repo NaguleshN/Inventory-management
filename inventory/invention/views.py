@@ -44,14 +44,22 @@ def form_valid(self, form):
 
 #Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
-    allowed_emails = ['nagulesh.22cs@kct.ac.in','chaaivisva.22cs@kct.ac.in','paramasivan.22mc@kct.ac.in']
+    email=AdminMail.objects.all()
+    allowed_emails = ['nagulesh.22cs@kct.ac.in']
+    for e in email:
+        allowed_emails.append(e.mail)
+        
+    for i in allowed_emails:
+        print(i)
+    # group = Group.objects.get(name='admin')
+    # user.group.add('admin')
     if user and user.email not in allowed_emails:
         return redirect('custom_forbidden')
     return {'details': details, 'user': user, 'is_new': is_new}
 
 def custom_forbidden(request):
     if request.method=="POST":
-        return render(request, 'credential/login.html')
+        return redirect('login')
     return render(request, 'custom_forbidden.html')
 
 
@@ -64,8 +72,6 @@ def login(request):
     if request.method=='POST':
         rollno=request.POST.get('rollno')
         password="iqube@kct"
-        print(rollno)
-        print(password)
         user=auth.authenticate(username=rollno,password=password)
         if user != None:
             auth.login(request,user)
@@ -86,6 +92,7 @@ def signup(request):
         password='iqube@kct'
         user = User.objects.create_user(username=rollno,password=password)
         user=auth.authenticate(username=rollno,password=password)           
+        
         #New user in student_user group
         group = Group.objects.get(name='student_user')
         user.groups.add(group)
@@ -149,12 +156,8 @@ def add_to_cart(request, product_id):
                 quantity_int = int(quantity)
                 if quantity_int <= products.available_count and quantity_int != 0 and products.dummy_count >0:
                     temporary_cart[product_id] += quantity_int
-                    print(temporary_cart[product_id])
-                    print(products.available_count)
                     products.dummy_count -= temporary_cart[product_id]
                     products.save()
-                    print(products.available_count)
-                    
                 else:
                     messages.warning(request, "Give the Correct Quantity.")
             except ValueError:
@@ -176,9 +179,6 @@ def remove_from_cart(request, product_id):
     products = Product.objects.get(id = product_id)
     if product_id in temporary_cart:
         if temporary_cart[product_id] > 0:
-                print(products.available_count)
-                print(temporary_cart[product_id])
-                print(products.dummy_count)
                 products.dummy_count += temporary_cart[product_id]
                 products.save()
                 del temporary_cart[product_id]
@@ -209,14 +209,12 @@ def decrease_quantity(request, product_id):
     return redirect('view_cart')
 
 
-
 def increase_quantity(request, product_id):
     if product_id in temporary_cart:
         product = Product.objects.get(pk=product_id)
         if product.available_count > temporary_cart[product_id]:
             temporary_cart[product_id] += 1
     return redirect('view_cart')
-
 
 
 def update_quantity(request, product_id, quantity):
@@ -227,8 +225,7 @@ def update_quantity(request, product_id, quantity):
         updated_available_quantity = product.available_count
         return JsonResponse({'success': True, 'updatedAvailableQuantity': updated_available_quantity})
     else:
-        return JsonResponse({'success': False})
-    
+        return JsonResponse({'success': False})  
 
 
 #Return-Form-View
@@ -273,21 +270,14 @@ class AddReturnView(View):
         
         return_quantity = request.POST.get("return_qty")
 
-        print("Return quantity",return_quantity)
-        print("Item quantity" , item.quantity)
         if return_quantity is not None and return_quantity.isdigit() and int(return_quantity) <= item.quantity and int(return_quantity) > 0:
             product = item.product
             return_quantity = int(return_quantity)
-            print(return_quantity)
             quantity =  return_quantity
             item.quantity -= return_quantity
-            print("Item Quantity" , item.quantity)
-            print("Quantity",quantity)
             item.save()
-            print("Available Count" , product.available_count)
             product.available_count += quantity
             product.dummy_count += quantity
-            print(product.available_count)
             product.save()
 
             if item.quantity == 0:
@@ -296,8 +286,7 @@ class AddReturnView(View):
             if item:
                 return redirect('return_form')
         else:
-            messages.warning(request, "Give the correct Quantity.")
-
+            pass
         
         return render(
             request,
@@ -330,7 +319,7 @@ class AddWastageView(View):
         if damaged_quantity is not None and damaged_quantity.isdigit() and int(damaged_quantity) <= item.quantity and int(damaged_quantity) > 0:
             damaged_quantity = int(damaged_quantity)
             item.quantity -= damaged_quantity
-            
+
         
             item.save()
 
@@ -338,11 +327,11 @@ class AddWastageView(View):
             if item.quantity == 0:
                 item.delete()
                 return redirect('return_form')
-            if item:
-                return redirect('return_form')
+        
+            return redirect('return_form')
             
         else:
-            messages.warning(request, 'You have to Look up the quantity')
+            pass
 
         return render(
             request,
@@ -358,34 +347,42 @@ class AddWastageView(View):
 @allowed_user(allowed_roles=['superadmin'])
 def users_list(request):
     users = User.objects.all()
-    return render(request, 'superadmin_view/users.html', {'users': users})
+    admins=AdminMail.objects.all()
+    pattern= r"^[a-zA-Z0-9_.]+@(kct\.)+(ac\.)+in$"
+    if request.method=="POST":
+        email=request.POST.get("email")
+        print(email)
+        if re.match(pattern,email):
+            print("valid")
+            for i in admins:
+                if email==i.mail:
+                    sweetify.warning(request, 'Microsoft mail-id already exists ',button="OK")
+                    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
+            AdminMail.objects.create(mail=email)
+        users = User.objects.all()
+        return redirect('users_list')
+    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
 
 
 #Super-Admin-Remove-The-Admin-Role
-@login_required(login_url='login')
-@allowed_user(allowed_roles=['superadmin'])
+
 def remove_role(request, user_id):
-    if request.method == 'POST':
-        user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='admin') 
-        user.groups.remove(admin_group)
-        return redirect('users_list')
-    else:
-        pass
-    return redirect(request, 'superadmin_view/users.html', {'user':user, } )
+    emails=AdminMail.objects.all()
+    AdminMail.objects.filter(id=user_id).delete()
+    return redirect('users_list')
 
 
 #Super-Admin-Apoint-Admin
-@allowed_user(allowed_roles=['superadmin'])
-def appoint_admin(request, user_id):
-    if request.method == 'POST':
-        user = get_object_or_404(User, id=user_id)
-        admin_group = Group.objects.get(name='admin') 
-        user.groups.add(admin_group)
-        return redirect('users_list')
-    else:
-        pass
-    return redirect(request, 'super_admin/users.html', {'user':user, } )
+# @allowed_user(allowed_roles=['superadmin'])
+# def appoint_admin(request, user_id):
+#     if request.method == 'POST':
+#         user = get_object_or_404(User, id=user_id)
+#         admin_group = Group.objects.get(name='admin') 
+#         user.groups.add(admin_group)
+#         return redirect('users_list')
+#     else:
+#         pass
+#     return redirect(request, 'super_admin/users.html', {'user':user, } )
 
 
 #Log-For-Admin-SuperAdmin
@@ -411,6 +408,7 @@ def wastage(request):
 @login_required(login_url='login')
 def add_product(request):
    category=Category.objects.all()
+   products = Product.objects.all()
    if request.method=="POST" and request.FILES.get('image'):
          product_name=request.POST.get("name")
          decription=request.POST.get("description")
@@ -419,8 +417,6 @@ def add_product(request):
          img=request.FILES["image"]   
          cat=request.POST.get("category")
          category=Category.objects.get(name=cat)
-         print(actual_count)
-         print(available_count)
          if int(actual_count) >= int(available_count):
             print("exec add product")
             Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img, dummy_count = available_count)
@@ -430,7 +426,7 @@ def add_product(request):
              sweetify.warning(request, 'Product added successfully',button="OK")
              return redirect("Add_product")
     
-   return render (request,"adminview/add_product.html",{"category":category})
+   return render (request,"adminview/add_product.html",{"category":category, "products":products,})
 
 
 #Add-Category-For-Admin-SuperAdmin
@@ -438,9 +434,10 @@ def add_product(request):
 @login_required(login_url='login')
 def add_category(request):
      categories = Category.objects.all()
+     existing_categories = Category.objects.values_list('name', flat=True)
      if request.method == "POST":
          name = request.POST.get('name')
          Category.objects.create(name = name, created_by = request.user)
-     return render(request, 'adminview/add_category.html', {'categories': categories})
+     return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories)})
 
 

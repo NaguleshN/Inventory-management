@@ -86,3 +86,6 @@ class CheckedOutLog(models.Model):
 
     def _str_(self):
         return str(self.product)
+
+class AdminMail(models.Model):
+    mail=models.CharField(max_length=50)

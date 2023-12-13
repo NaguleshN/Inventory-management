@@ -15,6 +15,7 @@
   }
 </style>
 
+
 <div class="p-4" id="waste">
   <div class="container">
     <div class="row justify-content-center">
@@ -49,7 +50,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="damaged-quantity" class="form-label custom-label">Damaged Quantity</label>
-                  <input type="number" class="form-control" id="damaged-quantity" name="damaged_qty" required>
+                  <input type="number" min="0" value="0" class="form-control" name="damaged_qty" required>
                 </div>
                 <div class="mb-3">
                   <label for="reason" class="form-label custom-label">Reason</label>
@@ -69,4 +70,28 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const damagedQuantity = parseInt(document.querySelector('input[name="damaged_qty"]').value);
+      const takenQuantity = parseInt('{{ item.quantity }}'); 
+
+      if (damagedQuantity <= 0) {
+        alert('OOPS!! Quantity should not be Zero.');
+        return;
+      }
+
+      if (damagedQuantity > takenQuantity) {
+        alert('Enter the correct quantity.');
+        return;
+      }
+
+      form.submit();
+    });
+  });
+</script>
 {% endblock %}
