@@ -31,14 +31,15 @@
                 </div>
             </div>
         </div>
+    
         {% for group in request.user.groups.all %}
             {% if group.name == 'superadmin' %}
             <div class="col">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title text-center">Super Admin</h5>
-                        <p class="card-text text-center">Add Admin</p>
-                        <a href="{% url 'users_list' %}" class="btn btn-primary d-block mx-auto">Add Products</a>
+                        <p class="card-text text-center">Admin List</p>
+                        <a href="{% url 'users_list' %}" class="btn btn-primary d-block mx-auto">Add Admin</a>
                     </div>
                 </div>
             </div>
@@ -48,8 +49,11 @@
     
     <div class="card mt-4 mb-5">
         <div class="card-header bg-light">
+            <div class="col">
             <h2 class="card-title text-center">ALL LOGS DETAIL</h2>
+            </div>
         </div>
+    </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover">

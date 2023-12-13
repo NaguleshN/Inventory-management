@@ -37,6 +37,8 @@ DEFAULT_FROM_EMAIL = '<aravindayyavoo549@gmail.com>'
 ALLOWED_HOSTS = ['*']
 
 
+
+
 # Application definition
 
 INSTALLED_APPS = [

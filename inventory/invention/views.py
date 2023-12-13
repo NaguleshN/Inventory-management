@@ -22,6 +22,8 @@ from django.views.generic.edit import FormView
 from django.http import HttpResponse
 from .tasks import send_notification_mail
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
+import datetime
+from django.utils import timezone
 
 # Create your views here.
 def send_mail_to_all(request):
@@ -49,7 +51,7 @@ def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **
 
 def custom_forbidden(request):
     if request.method=="POST":
-        return render(request, 'login.html')
+        return render(request, 'credential/login.html')
     return render(request, 'custom_forbidden.html')
 
 
@@ -107,8 +109,6 @@ def home(request):
         user.groups.add(admin_group)
 
     products = Product.objects.all()
-    purchased_items = PurchasedItem.objects.filter(user = request.user)
-    cart_items = Cart.objects.all()
     query = request.GET.get('query', '')
     if query:
        products = products.filter(name__icontains = query)
@@ -147,10 +147,16 @@ def add_to_cart(request, product_id):
         if quantity is not None: 
             try:
                 quantity_int = int(quantity)
-                if quantity_int <= products.available_count:
+                if quantity_int <= products.available_count and quantity_int != 0 and products.dummy_count >0:
                     temporary_cart[product_id] += quantity_int
+                    print(temporary_cart[product_id])
+                    print(products.available_count)
+                    products.dummy_count -= temporary_cart[product_id]
+                    products.save()
+                    print(products.available_count)
+                    
                 else:
-                    messages.warning(request, "Don't give extra quantity.")
+                    messages.warning(request, "Give the Correct Quantity.")
             except ValueError:
                 return HttpResponse("Invalid quantity")
         return redirect('Home')
@@ -167,8 +173,14 @@ def view_cart(request):
 
 #Remove-Cart
 def remove_from_cart(request, product_id):
+    products = Product.objects.get(id = product_id)
     if product_id in temporary_cart:
         if temporary_cart[product_id] > 0:
+                print(products.available_count)
+                print(temporary_cart[product_id])
+                print(products.dummy_count)
+                products.dummy_count += temporary_cart[product_id]
+                products.save()
                 del temporary_cart[product_id]
     return redirect('view_cart')
 
@@ -180,8 +192,10 @@ def submit_cart(request):
         if product.available_count >= quantity:
             product.available_count -= quantity
             product.save()
-            PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.now() )
-            Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.now())
+            if request.method == "POST":
+                due_date = request.POST.get('due_date')
+                PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.datetime.now(),due_date = due_date)
+                Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.datetime.now(),due_date = due_date)
     temporary_cart.clear()
     return redirect("Home")
 
@@ -232,11 +246,65 @@ def return_all(request, item_id):
 
     CheckedOutLog.objects.create(product=product,quantity=item.quantity,user=request.user,status="checked_out")
     product.available_count += item.quantity
+    product.dummy_count += item.quantity
     product.save()
 
     item.delete()
 
     return redirect('return_form')
+
+
+#Return One-By-One Form
+class AddReturnView(View):
+    def get(self, request, item_id):
+        categories = Category.objects.all()
+        products = Log.objects.all()
+        item = get_object_or_404(Log, id=item_id)
+        return render(
+            request,
+            'cart/return.html',
+            {'categories': categories, 'products': products, 'item': item}
+        )
+    
+    def post(self, request, item_id):
+        categories = Category.objects.all()
+        products = Log.objects.all()
+        item = get_object_or_404(Log, id=item_id)
+        
+        return_quantity = request.POST.get("return_qty")
+
+        print("Return quantity",return_quantity)
+        print("Item quantity" , item.quantity)
+        if return_quantity is not None and return_quantity.isdigit() and int(return_quantity) <= item.quantity and int(return_quantity) > 0:
+            product = item.product
+            return_quantity = int(return_quantity)
+            print(return_quantity)
+            quantity =  return_quantity
+            item.quantity -= return_quantity
+            print("Item Quantity" , item.quantity)
+            print("Quantity",quantity)
+            item.save()
+            print("Available Count" , product.available_count)
+            product.available_count += quantity
+            product.dummy_count += quantity
+            print(product.available_count)
+            product.save()
+
+            if item.quantity == 0:
+                item.delete()
+                return redirect('return_form')
+            if item:
+                return redirect('return_form')
+        else:
+            messages.warning(request, "Give the correct Quantity.")
+
+        
+        return render(
+            request,
+            'cart/return.html',
+            {'categories': categories, 'products': products, 'item': item}
+        )
+
 
 
 #Damaged-Form
@@ -262,7 +330,7 @@ class AddWastageView(View):
         if damaged_quantity is not None and damaged_quantity.isdigit() and int(damaged_quantity) <= item.quantity and int(damaged_quantity) > 0:
             damaged_quantity = int(damaged_quantity)
             item.quantity -= damaged_quantity
-           
+            
         
             item.save()
 

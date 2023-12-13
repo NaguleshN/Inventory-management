@@ -18,11 +18,14 @@ app.conf.update(timezone = 'Asia/Kolkata')
 app.conf.beat_schedule = {
     'send-mail-ever-day-at-8' :{
         'task' : 'invention.tasks.send_notification_mail',
-        'schedule' : crontab(hour=16,minute=53),
-        # 'args' : ()
+        'schedule' : crontab(hour=17,minute=36),
+    },
+    'send-mail-ever-day-at-8' :{
+        'task' : 'invention.tasks.send_warning_mail',
+        'schedule' : crontab(hour=17,minute=36),
     }
-    
 }
+
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 

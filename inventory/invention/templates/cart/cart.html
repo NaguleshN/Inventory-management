@@ -62,6 +62,10 @@
             <div class="col-md-6 text-end">
               <form action="{% url 'submit_cart' %}" method="post">
                 {% csrf_token %}
+                <div class="txt_field">
+                  <label>Due Date :</label>
+                  <input type="date" name="due_date">
+                </div>
                 <input type="submit" value="Submit Cart" class="btn btn-primary">
               </form>
             </div>
