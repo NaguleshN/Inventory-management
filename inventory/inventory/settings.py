@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     #django built in app 
     'social_django',
     
-    # gpt
+    'api',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
