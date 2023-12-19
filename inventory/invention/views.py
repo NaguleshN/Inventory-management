@@ -24,6 +24,9 @@ from .tasks import send_notification_mail
 from django_celery_beat.models import PeriodicTask, CrontabSchedule
 import datetime
 from django.utils import timezone
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, APIView
+
 
 # Create your views here.
 def send_mail_to_all(request):
@@ -121,6 +124,7 @@ def home(request):
        products = products.filter(name__icontains = query)
     
     return render(request, 'core/home.html', {'products': products,})
+    
 
 
 #View-Product-Details-As-View-Details

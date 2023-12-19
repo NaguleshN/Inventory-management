@@ -9,6 +9,25 @@
   <style>
     /* Your existing custom styles */
   </style>
+  <script>
+    function confirmRemoveItem(itemId) {
+      const confirmation = confirm("Are you sure you want to remove this item from the cart?");
+      if (confirmation) {
+        document.getElementById(`removeItem_${itemId}`).submit();
+      } else {
+        return false;
+      }
+    }
+  
+    function confirmSubmitCart() {
+      const confirmation = confirm("It's okay to submit the cart with these items?");
+      if (confirmation) {
+        document.getElementById('submitCartForm').submit();
+      } else {
+        return false;
+      }
+    }
+  </script>
 </head>
 <body>
   <section class="vh-100 d-flex align-items-center">
@@ -38,9 +57,9 @@
                   <td>{{ item.quantity }}</td>
                   <td>{{ item.product.category }}</td>
                   <td>
-                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post">
+                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post" id="removeItem_{{ item.product.id }}">
                       {% csrf_token %}
-                      <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                      <button type="button" class="btn btn-danger btn-sm" onclick="return confirmRemoveItem('{{ item.product.id }}')">Remove</button>
                     </form>
                   </td>
                 </tr>
@@ -58,9 +77,14 @@
               <a href="{% url 'Home' %}" class="btn btn-secondary"><i class="fas fa-long-arrow-alt-left me-2"></i>Back to Home</a>
             </div>
             <div class="col-md-6 text-end">
-              <form action="{% url 'submit_cart' %}" method="post">
+              <form id="submitCartForm" action="{% url 'submit_cart' %}" method="post">
                 {% csrf_token %}
-                <input type="submit" value="Submit Cart" class="btn btn-primary">
+                <div>
+                  <label>Due Date :</label>
+                  <input type="date" name="due_date">
+                </div>
+                <br>
+                <input type="button" value="Submit Cart" class="btn btn-primary" onclick="return confirmSubmitCart()">
               </form>
             </div>
           </div>
