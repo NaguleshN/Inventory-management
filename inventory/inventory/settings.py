@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
 
+    #Rest_framework
+    'rest_framework',
+    
     #own
     'invention',
     'sweetify',

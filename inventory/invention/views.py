@@ -28,6 +28,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, APIView
 
 
+#rest_api
+from rest_framework.decorators import api_view
+from rest_framework.response import Response    
 # Create your views here.
 def send_mail_to_all(request):
   send_mail_func.delay()
@@ -54,8 +57,6 @@ def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **
         
     for i in allowed_emails:
         print(i)
-    # group = Group.objects.get(name='admin')
-    # user.group.add('admin')
     if user and user.email not in allowed_emails:
         return redirect('custom_forbidden')
     return {'details': details, 'user': user, 'is_new': is_new}
@@ -75,12 +76,15 @@ def login(request):
     if request.method=='POST':
         rollno=request.POST.get('rollno')
         password="iqube@kct"
-        user=auth.authenticate(username=rollno,password=password)
-        if user != None:
-            auth.login(request,user)
-            return redirect('Home')
-        else:
-            return redirect('Register')
+        try:
+            user=auth.authenticate(username=rollno,password=password)
+            if user != None:
+                auth.login(request,user)
+                return redirect('Home')
+            else:
+                return redirect('Register')
+        except:
+            return redirect('no_permission')
  
     return render(request,'credential/login.html')
 
