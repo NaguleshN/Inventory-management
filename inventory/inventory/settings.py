@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #Rest_framework
+    'rest_framework',
+    
     #own
     'invention',
     'sweetify',
