@@ -10,11 +10,6 @@ django-microsoft-auth==3.0.1
 social-auth-app-django==5.4.0
 django-allauth==0.58.2
 python-decouple==3.8
-# social-auth-core==4.5.0
-
-
-
-
 celery==5.3.6
 django-celery-beat==2.5.0
 django-celery-results==2.5.1
