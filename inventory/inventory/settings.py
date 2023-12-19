@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     
     #django built in app 
     'social_django',
-    'rest_framework',
     
     'allauth',
     'allauth.account',

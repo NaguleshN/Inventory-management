@@ -25,7 +25,8 @@
         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
             <div class="col-md-6 d-none d-lg-block d-md-block justify-content-center" id="image">
                 <img src="{% static 'images\10yearslogo_1-1-1_page-0001-removebg-preview.png' %}" alt="" weight>
-               </div>
+            </div>
+              
           <div class="col p-4 d-flex flex-column position-static" >
 
             <form method="POST" enctype="multipart/form-data" id="productForm">
@@ -73,6 +74,9 @@
                   </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </form>
+              <div class="mt-3">
+                <a href="{% url 'product' %}"><button class="btn btn-outline-primary" >View Product</button></a>
+              </div>
           </div>
           
         </div>

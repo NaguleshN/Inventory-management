@@ -21,9 +21,16 @@ urlpatterns = [
 
     #Admin-and-superadmin
     path('admin_views/', views.admin_view, name='admin_views'),
-    path('add_product/', views.add_product ,name="Add_product"), 
-    path('add_category/', views.add_category, name="Add_category"),
     path('wastage_render/', views.wastage, name='wastage_render'),
+    
+    path('add_product/', views.add_product ,name="Add_product"), 
+    path('product/', views.view_product, name="product"),
+    path('remove_product/<int:pk>/', views.remove_product, name="delete_product"),
+
+    path('add_category/', views.add_category, name="Add_category"),
+    path('category/', views.category, name= "category"),
+    path('delete_category/<int:category_id>/', views.remove_category, name="delete_category"),
+    path('edit_category/<int:category_id>/', views.edit_category, name="edit_category"),
 
 
     #access-denied-page

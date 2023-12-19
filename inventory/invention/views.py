@@ -32,9 +32,7 @@ from rest_framework.decorators import api_view, APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response    
 # Create your views here.
-def send_mail_to_all(request):
-  send_mail_func.delay()
-  return HttpResponse("Sent")
+
 
 # def schedule_mail(request):
 #   schedule, created = CrontabSchedule.objects.get_or_create(hour = 18, minute = 30)
@@ -436,6 +434,22 @@ def add_product(request):
     
    return render (request,"adminview/add_product.html",{"category":category, "products":products,})
 
+#View-Product-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def view_product(request):
+    products = Product.objects.all()
+    return render(request, 'adminview/product.html', {'products':products,})
+
+
+#Remove-Product-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def remove_product(request, pk):
+    product = Product.objects.get(pk = pk)
+    product.delete()
+    return redirect('product')
+
 
 #Add-Category-For-Admin-SuperAdmin
 @allowed_user(allowed_roles=['admin', 'superadmin'])
@@ -447,5 +461,37 @@ def add_category(request):
          name = request.POST.get('name')
          Category.objects.create(name = name, created_by = request.user)
      return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories)})
+
+
+#View-Category-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def category(request):
+        categories = Category.objects.all()
+        return render(request, 'adminview/editCategory.html', {'categories': categories,})
+
+
+#Remove-Category-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def remove_category(request, category_id):
+    category = Category.objects.get(id = category_id)
+    category.delete()
+    return redirect('Add_category')
+
+
+#Edit-Category-For-Admin-SuperAdmin
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def edit_category(request, category_id):
+    category = Category.objects.get(id = category_id)
+    if request.method == "POST":
+       new_category_name = request.POST.get('new_category_name')
+
+       if new_category_name:
+            category.name = new_category_name
+            category.save()
+            return redirect('Add_category')
+    return render(request, 'adminview/edit_category.html', {"category":category,})
 
 
