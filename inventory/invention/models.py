@@ -17,7 +17,7 @@ class Product(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return str(self.name)
  
  
 class Category(models.Model):
@@ -29,13 +29,13 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
     def __str__(self):
-        return self.name
+        return str(self.name)
     
 temporary_cart = {} 
+
 class Cart(models.Model):
     product_name=models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField(default=0)
-    due_date=models.DateTimeField(default=datetime.datetime.now())
     created_by=models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
@@ -58,8 +58,9 @@ class PurchasedItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_added = models.DateTimeField(default=datetime.datetime.now()) 
+    date_added = models.DateTimeField() 
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
+    due_date = models.DateTimeField()
     
     def _str_(self):
         return str(self.product)
@@ -72,6 +73,7 @@ class Log(models.Model):
     created_at = models.DateTimeField(default=datetime.datetime.now())
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     acting = models.CharField(max_length=20, default="hi")
+    due_date = models.DateTimeField()
     def _str_(self):
         return str(self.product)
 

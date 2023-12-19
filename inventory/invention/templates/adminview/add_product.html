@@ -28,7 +28,7 @@
                </div>
           <div class="col p-4 d-flex flex-column position-static" >
 
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" id="productForm">
                 {% csrf_token%}
                 
                 <center><h1 style="font-style:Serif">PRODUCT FORM</h1></center>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Product Name</label>
-                  <input type="text" class="form-control" id="exampleInputEmail1"name="name">
+                  <input type="text" class="form-control" id="exampleInputEmail1" name="name">
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Description</label>
@@ -71,9 +71,6 @@
                     <label for="img" class="form-label">Image</label>
                     <input type="file" class="form-control" id="img"  name="image" required>
                   </div>
-                 
-
-                   
                 <button type="submit" class="btn btn-primary">Submit</button>
               </form>
           </div>

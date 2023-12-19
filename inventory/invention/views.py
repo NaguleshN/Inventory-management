@@ -1,6 +1,5 @@
 import re
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import auth
 from django.contrib import messages
 from django.shortcuts import render,redirect, get_object_or_404
 from .models import *
@@ -12,10 +11,39 @@ from django.contrib.auth.models import Group, User
 from django.http import HttpResponseRedirect, JsonResponse
 from collections import defaultdict
 from django.views import View
+from django.contrib.auth.models import User, auth
+from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from .tasks import send_notification_mail
+from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
+from django.http import HttpResponse
+from .tasks import send_notification_mail
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+import datetime
+from django.utils import timezone
 
 #rest_api
 from rest_framework.decorators import api_view
 from rest_framework.response import Response    
+# Create your views here.
+def send_mail_to_all(request):
+  send_mail_func.delay()
+  return HttpResponse("Sent")
+
+# def schedule_mail(request):
+#   schedule, created = CrontabSchedule.objects.get_or_create(hour = 18, minute = 30)
+#   task = PeriodicTask.objects.create(crontab=schedule, name="schedule_mail_task_"+"1", task="mail.tasks.send_mail_func" )
+#   return HttpResponse("Done")
+
+  
+def form_valid(self, form):
+        email = form.cleaned_data["email"]
+        message = form.cleaned_data["message"]
+        send_notification_mail.delay(email,message)
+        return HttpResponse('We have sent you a confirmation mail!')
 
 #Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
@@ -168,8 +196,10 @@ def submit_cart(request):
         if product.available_count >= quantity:
             product.available_count -= quantity
             product.save()
-            PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.now() )
-            Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.now())
+            if request.method == "POST":
+                due_date = request.POST.get('due_date')
+                PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.datetime.now(),due_date = due_date)
+                Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.datetime.now(),due_date = due_date)
     temporary_cart.clear()
     return redirect("Home")
 

@@ -21,7 +21,7 @@
       <div class="col-lg-8">
         <div class="form-card shadow p-4 mb-4">
           <h1 class="text-center mb-4">Return Form</h1>
-          <form method="POST">
+          <form method="POST" id="productForm">
             {% csrf_token %}
             <div class="row">
               <div class="col-md-6">
@@ -51,7 +51,7 @@
                   <label for="damaged-quantity" class="form-label custom-label">Return Quantity</label>
                   <input type="number" min="0" value="0" class="form-control" id="damaged-quantity" name="return_qty" required>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                <button type="submit" class="btn btn-primary mt-3" onclick="return confirmSubmitCart()">Submit</button>
               </div>
             </div>
           </form>
@@ -66,6 +66,15 @@
   </div>
 </div>
 <script>
+  function confirmSubmitCart() {
+    const confirmation = confirm("It's okay to submit");
+    if (confirmation) {
+      document.getElementById('productForm').submit();
+    } else {
+      return false;
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
 
