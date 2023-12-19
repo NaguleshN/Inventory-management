@@ -107,7 +107,7 @@ def signup(request):
             sweetify.success(request, 'You are successfully created',button="OK")
             messages.success(request, f"Account Successfully Created for {rollno}")
             return redirect('Home')
-                
+
     return render(request, 'credential/register.html')
 
 
