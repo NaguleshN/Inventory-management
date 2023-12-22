@@ -1,15 +1,19 @@
 FROM python:3.11
 
+# ENV PYTHONBUFFERD=1
+
+RUN mkdir -p /inventory
+
 WORKDIR /inventory
 
-RUN mkdir static
+# ADD . /inventory
 
-COPY requirements.txt /inventory/
+COPY requirements.txt requirements.txt
 
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
-COPY . /inventory/
+COPY . .
 
-EXPOSE 8000
+# EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver"]
+CMD python manage.py runserver 0.0.0.0:8000

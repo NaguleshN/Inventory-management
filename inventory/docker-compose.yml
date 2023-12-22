@@ -1,10 +1,16 @@
-version: '3'
+      - "8000:8000"
+version: '3.11'
 
 services:
-  web:
+  
+
+  app:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/inventory
     ports:
-      - "8000:8000"
+        - 8000:8000
+    image: app:django
+    container_name: my_first_django_container
+    command: python manage.py runserver 0.0.0.0:8000 
+    
