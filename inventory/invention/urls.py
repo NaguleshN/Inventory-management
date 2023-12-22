@@ -16,8 +16,7 @@ urlpatterns = [
     #Home-Page-And-navbar-page-For-Users
     path('', views.home ,name="Home"), 
     path('about/', views.about , name="About"),
-    path('product_description/<int:pk>', views.product_description, name="Product_description"),
-
+    path('product_description/<int:pk>/', views.product_description, name="Product_description"),
 
     #Admin-and-superadmin
     path('admin_views/', views.admin_view, name='admin_views'),

@@ -121,12 +121,9 @@ def home(request):
         user.groups.add(admin_group)
 
     products = Product.objects.all()
-    query = request.GET.get('query', '')
-    if query:
-       products = products.filter(name__icontains = query)
-    
+    print(products)
     return render(request, 'core/home.html', {'products': products,})
-    
+
 
 
 #View-Product-Details-As-View-Details
@@ -189,6 +186,7 @@ def remove_from_cart(request, product_id):
                 products.save()
                 del temporary_cart[product_id]
     return redirect('view_cart')
+
 
 
 #Submit-In-Cart
