@@ -26,6 +26,7 @@ import datetime
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, APIView
+from django.db import transaction
 
 
 #rest_api
@@ -129,7 +130,7 @@ def home(request):
 #View-Product-Details-As-View-Details
 @login_required(login_url='login')
 def product_description(request, pk):
-    item = Product.objects.get( pk =pk)
+    item = Product.objects.get(pk =pk)
     return render(request, 'core/product_description.html', {'item':item,})
 
 
@@ -148,24 +149,28 @@ def no_permission(request):
 
 #Add-To-Cart
 temporary_cart = defaultdict(int)
+
 def add_to_cart(request, product_id):
-    products = Product.objects.get(id=product_id)
-    if products.available_count == 0:
-        messages.info(request, 'There is not Available stock for it.')
+    product = Product.objects.select_for_update().get(id=product_id)
+    if product.available_count == 0:
+        messages.info(request, 'There is no available stock for this product.')
+        return redirect('Home')
     if request.method == "POST":
         quantity = request.POST.get("count")
         if quantity is not None: 
             try:
                 quantity_int = int(quantity)
-                if quantity_int <= products.available_count and quantity_int != 0 and products.dummy_count >0:
-                    temporary_cart[product_id] += quantity_int
-                    products.dummy_count -= temporary_cart[product_id]
-                    products.save()
+                if 0 < quantity_int <= product.available_count and quantity_int <= product.dummy_count:
+                    with transaction.atomic():
+                        if quantity_int <= product.dummy_count - temporary_cart[product_id]:
+                            temporary_cart[product_id] += quantity_int
+                        else:
+                            messages.warning(request, "Not Enough quantity available.")
                 else:
-                    messages.warning(request, "Give the Correct Quantity.")
+                    messages.warning(request, "look up a valid quantity.")
             except ValueError:
                 return HttpResponse("Invalid quantity")
-        return redirect('Home')
+    return redirect('Home')
 
 
 #View-Cart
@@ -191,15 +196,17 @@ def remove_from_cart(request, product_id):
 
 #Submit-In-Cart
 def submit_cart(request):
-    for product_id, quantity in temporary_cart.items():
-        product = Product.objects.get(pk=product_id)
-        if product.available_count >= quantity:
-            product.available_count -= quantity
-            product.save()
-            if request.method == "POST":
-                due_date = request.POST.get('due_date')
-                PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.datetime.now(),due_date = due_date)
-                Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.datetime.now(),due_date = due_date)
+    with transaction.atomic():
+        for product_id, quantity in temporary_cart.items():
+            product = Product.objects.select_for_update().get(pk=product_id) 
+            if product.available_count >= quantity:
+                product.available_count -= quantity
+                product.dummy_count -= quantity  
+                product.save()
+                if request.method == "POST":
+                    due_date = request.POST.get('due_date')
+                    PurchasedItem.objects.create(product=product, quantity=quantity, user=request.user, date_added=datetime.datetime.now(), due_date=due_date)
+                    Log.objects.create(product=product, quantity=quantity, user=request.user, status="checked_in", created_at=datetime.datetime.now(), due_date=due_date)
     temporary_cart.clear()
     return redirect("Home")
 
