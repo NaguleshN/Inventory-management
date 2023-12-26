@@ -158,7 +158,8 @@ def add_to_cart(request, product_id):
     if request.method == "POST":
         quantity = request.POST.get("count")
         if quantity is not None: 
-            try:
+            # try:
+                print(quantity)
                 quantity_int = int(quantity)
                 if 0 < quantity_int <= product.available_count and quantity_int <= product.dummy_count:
                     with transaction.atomic():
@@ -188,6 +189,7 @@ def remove_from_cart(request, product_id):
     if product_id in temporary_cart:
         if temporary_cart[product_id] > 0:
                 products.dummy_count += temporary_cart[product_id]
+                print( products.dummy_count)
                 products.save()
                 del temporary_cart[product_id]
     return redirect('view_cart')
