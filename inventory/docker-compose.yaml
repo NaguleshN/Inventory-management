@@ -1,18 +1,27 @@
-version: "3.9"
+version: '3.9'
 
 services:
   web:
+    container_name: inventory_web
+    restart: always
     build: .
     ports:
-      - "8000:8000"
-    depends_on:
+      - "6541:8000"
+    expose:
+      - "8000"
+    links:
       - redis
-    environment:
-      - DATABASE_URL=sqlite:///db.sqlite3
-      - REDIS_URL=redis://redis:6379/0
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-  
+    command: sh '/inventory/run_web.sh'
   redis:
+    container_name: inventory_redis
+    restart: always
     image: redis:latest
     ports:
-      - "6379:6379"
+      - "6543:6379"
+  worker:
+    container_name: inventory_worker
+    build: .
+    restart: always
+    command: sh '/inventory/run_celery.sh'
+    links:
+      - redis
