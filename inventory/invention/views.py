@@ -158,7 +158,7 @@ def add_to_cart(request, product_id):
     if request.method == "POST":
         quantity = request.POST.get("count")
         if quantity is not None: 
-            # try:
+            try:
                 print(quantity)
                 quantity_int = int(quantity)
                 if 0 < quantity_int <= product.available_count and quantity_int <= product.dummy_count:

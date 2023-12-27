@@ -85,8 +85,9 @@
                 {% csrf_token %}
                 <div>
                   <label>Due Date :</label>
-                  <input type="date" name="due_date">
+                  <input type="date" name="due_date" id="id_due_date">
                 </div>
+                
                 <br>
                 <input type="button" value="Submit Cart" class="btn btn-primary" onclick="return confirmSubmitCart()">
               </form>
@@ -99,5 +100,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      var today = new Date().toISOString().split('T')[0];
+      var oneMonthLater = new Date();
+      oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+      var maxDate = oneMonthLater.toISOString().split('T')[0];
+      document.getElementById('id_due_date').min = today;
+      document.getElementById('id_due_date').max = maxDate;
+  });
+</script>
 {% endblock %}

@@ -208,6 +208,7 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'invention/static'),]
+
 STATIC_ROOT = 'static/'
 
 
