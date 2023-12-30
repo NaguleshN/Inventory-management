@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import F
 from django.contrib.auth.models import User
-from datetime import timezone
+from django.utils import timezone
 import datetime
 # from datetime.timezone import tz
 
@@ -48,7 +48,7 @@ class Wastage(models.Model):
     quantity=models.PositiveIntegerField()
     reason=models.TextField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=datetime.datetime.now())
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return str(self.user) 
@@ -70,7 +70,7 @@ class Log(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(default=datetime.datetime.now())
+    created_at = models.DateTimeField(timezone.now)
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     acting = models.CharField(max_length=20, default="hi")
     due_date = models.DateTimeField()
@@ -81,7 +81,7 @@ class CheckedOutLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(default=datetime.datetime.now())
+    created_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
 
     def _str_(self):
