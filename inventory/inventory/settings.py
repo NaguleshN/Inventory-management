@@ -26,7 +26,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 IS_PRODUCTION = config('IS_PRODUCTION')
 
-DEBUG = not IS_PRODUCTION
+# DEBUG = not IS_PRODUCTION
+DEBUG = True
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True

@@ -159,11 +159,27 @@ def add_to_cart(request, product_id):
         quantity = request.POST.get("count")
         if quantity is not None: 
             try:
-                print(quantity)
+                # print(quantity)
                 quantity_int = int(quantity)
                 if 0 < quantity_int <= product.available_count and quantity_int <= product.dummy_count:
                     with transaction.atomic():
                         if quantity_int <= product.dummy_count - temporary_cart[product_id]:
+                            a=0
+                            try:
+                                cart=Cart.objects.get(product_name=product,created_by=request.user)
+                                print(cart)
+                                print(cart.quantity)
+                                a=cart.quantity
+                                a += quantity_int
+                                cart.quantity=a
+                                cart=Cart.objects.get(product_name=product,created_by=request.user).delete()
+                                Cart.objects.create(product_name=product,quantity=a,created_by=request.user)
+                                
+                            except:
+                                Cart.objects.create(product_name=product,quantity=quantity_int,created_by=request.user)
+                                pass
+                            
+                            # cart=Cart.objects.get(product_name=product,created_by=request.user).delete()
                             temporary_cart[product_id] += quantity_int
                         else:
                             messages.warning(request, "Not Enough quantity available.")
@@ -173,43 +189,29 @@ def add_to_cart(request, product_id):
                 return HttpResponse("Invalid quantity")
     return redirect('Home')
 
-
 #View-Cart
 def view_cart(request):
-        cart_items = []
-        for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-        return render(request, 'cart/cart.html', {'cart_items':cart_items,})
-
+        cart=Cart.objects.filter(created_by=request.user)
+        product=Product.objects.all()
+        category=Category.objects.all()
+        return render(request, 'cart/cart.html', {'cart_items':cart,'product':product,'category':category})
 
 #Remove-Cart
 def remove_from_cart(request, product_id):
-    products = Product.objects.get(id = product_id)
-    if product_id in temporary_cart:
-        if temporary_cart[product_id] > 0:
-                products.dummy_count += temporary_cart[product_id]
-                print( products.dummy_count)
-                products.save()
-                del temporary_cart[product_id]
+    cart=Cart.objects.get(id=product_id,created_by=request.user).delete()
     return redirect('view_cart')
 
 
 
 #Submit-In-Cart
 def submit_cart(request):
-    with transaction.atomic():
-        for product_id, quantity in temporary_cart.items():
-            product = Product.objects.select_for_update().get(pk=product_id) 
-            if product.available_count >= quantity:
-                product.available_count -= quantity
-                product.dummy_count -= quantity  
-                product.save()
-                if request.method == "POST":
-                    due_date = request.POST.get('due_date')
-                    PurchasedItem.objects.create(product=product, quantity=quantity, user=request.user, date_added=datetime.datetime.now(), due_date=due_date)
-                    Log.objects.create(product=product, quantity=quantity, user=request.user, status="checked_in", created_at=datetime.datetime.now(), due_date=due_date)
-    temporary_cart.clear()
+    if request.method == "POST":
+        due_date = request.POST.get('due_date')
+        for i in Cart.objects.filter(created_by=request.user):
+            status='checked_in'
+            PurchasedItem.objects.create(product=i.product_name, quantity=i.quantity, user=request.user,status=status,date_added=datetime.datetime.now(), due_date=due_date)
+            Log.objects.create(product=i.product_name, quantity=i.quantity, user=request.user, status=status, created_at=datetime.datetime.now(), due_date=due_date)
+            Cart.objects.filter(created_by=request.user).delete()
     return redirect("Home")
 
 
@@ -258,9 +260,7 @@ def return_all(request, item_id):
     product.available_count += item.quantity
     product.dummy_count += item.quantity
     product.save()
-
     item.delete()
-
     return redirect('return_form')
 
 

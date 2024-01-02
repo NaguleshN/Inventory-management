@@ -57,13 +57,13 @@
                 {% for item in cart_items %}
                 <tr>
                   <td><img src="{{ media_url }}{{item.product.image.url}}" alt="{{ item.product.name }}" class="img-fluid shadow-sm border border-black" height="150" width="200"></td>
-                  <td>{{ item.product.name }}</td>
+                  <td>{{ item.product_name.name }}</td>
                   <td>{{ item.quantity }}</td>
-                  <td>{{ item.product.category }}</td>
+                  <td>{{ item.product_name.category }}</td>
                   <td>
-                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post" id="removeItem_{{ item.product.id }}">
+                    <form action="{% url 'remove_from_cart' item.id %}" method="post" id="removeItem_{{ item.id }}">
                       {% csrf_token %}
-                      <button type="button" class="btn btn-danger btn-sm" onclick="return confirmRemoveItem('{{ item.product.id }}')">Remove</button>
+                      <button type="button" class="btn btn-danger btn-sm" onclick="return confirmRemoveItem('{{ item.id }}')">Remove</button>
                     </form>
                   </td>
                 </tr>
@@ -85,9 +85,8 @@
                 {% csrf_token %}
                 <div>
                   <label>Due Date :</label>
-                  <input type="date" name="due_date" id="id_due_date">
+                  <input type="date" name="due_date" id="id_due_date" required>
                 </div>
-                
                 <br>
                 <input type="button" value="Submit Cart" class="btn btn-primary" onclick="return confirmSubmitCart()">
               </form>
