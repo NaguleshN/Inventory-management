@@ -27,7 +27,7 @@
           <form action="{% url 'add_to_cart' product.id %}" method="post" class="mt-3" onsubmit="return validateForm(this, {{ product.available_count }})" onsubmit="return validateForm(this, {{ product.dummy_count }})">
             {% csrf_token %}
             <div class="input-group">
-              <input type="number" class="form-control" min="0" value="0" name="count">
+              <input type="number" class="form-control" min="0" max="{{ product.available_count }}" value="0" name="count">
               <button class="btn btn-outline-primary" type="button" onclick="increment(this)">+</button>
               <button class="btn btn-outline-primary" type="button" onclick="decrement(this)">-</button>
             </div>

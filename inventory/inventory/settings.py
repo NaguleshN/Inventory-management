@@ -26,8 +26,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 IS_PRODUCTION = config('IS_PRODUCTION')
 
-# DEBUG = not IS_PRODUCTION
-DEBUG = True
+DEBUG = IS_PRODUCTION
+# DEBUG = True
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
@@ -202,6 +202,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 # CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
 CELERY_RESULT_BACKEND = 'django-db'
+broker_connection_retry_on_startup = True
 
 # celery beat 
 # CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
@@ -215,7 +216,7 @@ STATIC_ROOT = 'static/'
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
 

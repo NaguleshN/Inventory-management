@@ -15,17 +15,19 @@
             <p>Category: {{ item.product.category }}</p>
             <p>Date & Time: {{ item.created_at}}</p>
             <div class="d-flex justify-content-between align-items-center mt-3">
+            {% if item.quantity != 1 %}
               <form action="{% url 'return' item.pk %}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary me-2">Return</button>
+                <button type="submit" id="return-button" class="btn btn-primary me-2">Return</button>
               </form>
+            {% endif %}
               <form action="{% url 'return_all' item.id %}" method="get">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Return All</button>
+                <button type="submit" id="return-all-button" class="btn btn-primary">Return All</button>
               </form>
               <form action="{% url 'Add_wastage' item.id %}" >
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Damaged</button>
+                <button type="submit" id="damaged-button" class="btn btn-danger">Damaged</button>
               </form>
             </div>
           </div>
@@ -45,5 +47,31 @@
   <div class="mb-5 mt-5">
     .
   </div>
+  <script>
+  function debounce(func, delay) {
+    let timer;
+    return function () {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
+    };
+}
+
+function delayfuction() {
+    alert('You have enter multiple times. Please wait for 5 seconds');
+}
+
+const button = document.getElementById('return-button');
+button.addEventListener('click', debounce(delayfuction(), 300)); 
+
+const button = document.getElementById('return-all-button');
+button.addEventListener('click', debounce(delayfuction(), 300));
+
+const button = document.getElementById('damaged-button');
+button.addEventListener('click', debounce(delayfuction(), 300));
+</script>
 </body>
 {% endblock %}
