@@ -74,7 +74,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for take in purchased_items %}
+                        {% for take in purchased_items reversed %}
                         <tr>
                             <td>{{take.user}}</td>
                             <td>{{take.product.name}}</td>

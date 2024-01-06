@@ -18,11 +18,11 @@ app.conf.update(timezone = 'Asia/Kolkata')
 app.conf.beat_schedule = {
     'send-mail-ever-day-at-8' :{
         'task' : 'invention.tasks.send_notification_mail',
-        'schedule' : crontab(hour=21,minute=45),
+        'schedule' : crontab(hour=12,minute=5),
     },
-    'send-mail-ever-day-at-8' :{
+    'send-warning-mail-at-8' :{
         'task' : 'invention.tasks.send_warning_mail',
-        'schedule' : crontab(hour=17,minute=36),
+        'schedule' : crontab(hour=12,minute=7),
     }
 }
 

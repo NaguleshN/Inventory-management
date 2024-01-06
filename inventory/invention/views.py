@@ -26,6 +26,7 @@ import datetime
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, APIView
+from django.db import transaction
 
 
 #rest_api
@@ -125,7 +126,13 @@ def home(request):
     if query:
        products = products.filter(name__icontains = query)
     
-    return render(request, 'core/home.html', {'products': products,})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    
+    return render(request, 'core/home.html', {'products': products, 'cart':cart,})
     
 
 
@@ -152,23 +159,26 @@ def no_permission(request):
 #Add-To-Cart
 temporary_cart = defaultdict(int)
 def add_to_cart(request, product_id):
-    products = Product.objects.get(id=product_id)
-    if products.available_count == 0:
-        messages.info(request, 'There is not Available stock for it.')
+    product = Product.objects.select_for_update().get(id=product_id)
+    if product.available_count == 0:
+        messages.info(request, 'There is no available stock for this product.')
+        return redirect('Home')
     if request.method == "POST":
         quantity = request.POST.get("count")
         if quantity is not None: 
             try:
                 quantity_int = int(quantity)
-                if quantity_int <= products.available_count and quantity_int != 0 and products.dummy_count >0:
-                    temporary_cart[product_id] += quantity_int
-                    products.dummy_count -= temporary_cart[product_id]
-                    products.save()
+                if 0 < quantity_int <= product.available_count and quantity_int <= product.dummy_count:
+                    with transaction.atomic():
+                        if quantity_int <= product.dummy_count - temporary_cart[product_id]:
+                            temporary_cart[product_id] += quantity_int
+                        else:
+                            messages.warning(request, "Not Enough quantity available.")
                 else:
-                    messages.warning(request, "Give the Correct Quantity.")
+                    messages.warning(request, "look up a valid quantity.")
             except ValueError:
                 return HttpResponse("Invalid quantity")
-        return redirect('Home')
+    return redirect('Home')
 
 
 #View-Cart
@@ -177,7 +187,8 @@ def view_cart(request):
         for product_id, quantity in temporary_cart.items():
             product = Product.objects.get(pk=product_id)
             cart_items.append({'product': product, 'quantity': quantity})
-        return render(request, 'cart/cart.html', {'cart_items':cart_items,})
+        cart = len(cart_items)
+        return render(request, 'cart/cart.html', {'cart_items':cart_items,'cart':cart,})
 
 
 #Remove-Cart
@@ -193,8 +204,9 @@ def remove_from_cart(request, product_id):
 
 #Submit-In-Cart
 def submit_cart(request):
+  with transaction.atomic():
     for product_id, quantity in temporary_cart.items():
-        product = Product.objects.get(pk=product_id)
+        product = Product.objects.select_for_update().get(pk=product_id)
         if product.available_count >= quantity:
             product.available_count -= quantity
             product.save()
@@ -237,7 +249,12 @@ def update_quantity(request, product_id, quantity):
 #Return-Form-View
 def return_form(request):
     purchased_items = Log.objects.filter(user = request.user) 
-    return render(request, 'cart/return_form.html', {'purchased_items':purchased_items,})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    return render(request, 'cart/return_form.html', {'purchased_items':purchased_items, 'cart':cart,})
 
 #Return-All
 def return_all(request, item_id):
@@ -263,10 +280,15 @@ class AddReturnView(View):
         categories = Category.objects.all()
         products = Log.objects.all()
         item = get_object_or_404(Log, id=item_id)
+        cart_items = []
+        for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+        cart = len(cart_items)
         return render(
             request,
             'cart/return.html',
-            {'categories': categories, 'products': products, 'item': item}
+            {'categories': categories, 'products': products, 'item': item, 'cart':cart,}
         )
     
     def post(self, request, item_id):
@@ -308,10 +330,15 @@ class AddWastageView(View):
         categories = Category.objects.all()
         products = Log.objects.all()
         item = get_object_or_404(Log, id=item_id)
+        cart_items = []
+        for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+        cart = len(cart_items)
         return render(
             request,
             'cart/wastage.html',
-            {'categories': categories, 'products': products, 'item': item}
+            {'categories': categories, 'products': products, 'item': item,'cart':cart}
         )
 
     def post(self, request, item_id):
@@ -367,7 +394,12 @@ def users_list(request):
             AdminMail.objects.create(mail=email)
         users = User.objects.all()
         return redirect('users_list')
-    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins, 'cart':cart,})
 
 
 #Super-Admin-Remove-The-Admin-Role
@@ -398,7 +430,12 @@ def admin_view(request):
     log = Log.objects.all()
     purchased_items = PurchasedItem.objects.all()
     checked_out = CheckedOutLog.objects.all()
-    return render(request, 'adminview/admin.html', {'log':log, 'checked_out':checked_out, 'purchased_items': purchased_items,})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    return render(request, 'adminview/admin.html', {'log':log, 'checked_out':checked_out, 'purchased_items': purchased_items,'cart':cart,})
 
 
 #Wastage-Record-View-For-Admin-SuperAdmin
@@ -406,7 +443,12 @@ def admin_view(request):
 @login_required(login_url='login')
 def wastage(request):
     wastage = Wastage.objects.all()
-    return render(request, 'adminview/wastage_render.html', {'wastage': wastage,})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    return render(request, 'adminview/wastage_render.html', {'wastage': wastage, 'cart':cart,})
 
 
 #Add-Product-For-Admin-SuperAdmin
@@ -431,15 +473,25 @@ def add_product(request):
          else:
              sweetify.warning(request, 'Product added successfully',button="OK")
              return redirect("Add_product")
+   cart_items = []
+   for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+   cart = len(cart_items)   
     
-   return render (request,"adminview/add_product.html",{"category":category, "products":products,})
+   return render (request,"adminview/add_product.html",{"category":category, "products":products, 'cart':cart,})
 
 #View-Product-For-Admin-SuperAdmin
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def view_product(request):
     products = Product.objects.all()
-    return render(request, 'adminview/product.html', {'products':products,})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    return render(request, 'adminview/product.html', {'products':products, 'cart':cart,})
 
 
 #Remove-Product-For-Admin-SuperAdmin
@@ -455,12 +507,18 @@ def remove_product(request, pk):
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def add_category(request):
-     categories = Category.objects.all()
-     existing_categories = Category.objects.values_list('name', flat=True)
-     if request.method == "POST":
+    categories = Category.objects.all()
+    existing_categories = Category.objects.values_list('name', flat=True)
+    if request.method == "POST":
          name = request.POST.get('name')
          Category.objects.create(name = name, created_by = request.user)
-     return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories)})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+         
+    return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories),'cart':cart})
 
 
 #View-Category-For-Admin-SuperAdmin
@@ -468,7 +526,12 @@ def add_category(request):
 @login_required(login_url='login')
 def category(request):
         categories = Category.objects.all()
-        return render(request, 'adminview/editCategory.html', {'categories': categories,})
+        cart_items = []
+        for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+        cart = len(cart_items)
+        return render(request, 'adminview/editCategory.html', {'categories': categories,'cart':cart})
 
 
 #Remove-Category-For-Admin-SuperAdmin
@@ -492,6 +555,11 @@ def edit_category(request, category_id):
             category.name = new_category_name
             category.save()
             return redirect('Add_category')
-    return render(request, 'adminview/edit_category.html', {"category":category,})
+    cart_items = []
+    for product_id, quantity in temporary_cart.items():
+            product = Product.objects.get(pk=product_id)
+            cart_items.append({'product': product, 'quantity': quantity})
+    cart = len(cart_items)
+    return render(request, 'adminview/edit_category.html', {"category":category,'cart':cart})
 
 

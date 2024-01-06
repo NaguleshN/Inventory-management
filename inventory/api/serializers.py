@@ -13,9 +13,10 @@ class GroupSerializer(serializers.ModelSerializer):
         fields=['name','permissions']
         
 class ProductSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(max_length=None, use_url=True)
     class Meta:
         model=Product
-        fields=['name','decription','actual_count','available_count','dummy_count','category','created_at','image']
+        fields="__all__"
 
 
 class LogSerializer(serializers.ModelSerializer):

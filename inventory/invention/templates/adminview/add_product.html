@@ -70,7 +70,8 @@
                   </div>
                   <div class="mb-3">
                     <label for="img" class="form-label">Image</label>
-                    <input type="file" class="form-control" id="img"  name="image" required>
+                    <!-- <input type="file" class="form-control" id="img"  name="image" accept=".png, .jpg, .jpeg" required> -->
+                    <input name="image" class="form-control" type="file" id="fileName" accept=".jpg,.jpeg,.png" onchange="validateFileType()"/>
                   </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
               </form>
@@ -113,6 +114,18 @@
               form.submit();
           });
       });
+
+      function validateFileType(){
+        var fileName = document.getElementById("fileName").value;
+        var idxDot = fileName.lastIndexOf(".") + 1;
+        var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+        if (extFile=="jpg" || extFile=="jpeg" || extFile=="png"){
+            //TO DO
+        }else{
+            alert("Only jpg/jpeg and png files are allowed!");
+        }   
+    }
+
   </script>
 </body>
 

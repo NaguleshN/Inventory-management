@@ -14,8 +14,8 @@ def send_notification_mail(self):
         purchased_items = PurchasedItem.objects.filter(user=user, due_date__date=timezone.now().date())
 
         for item in purchased_items:
-            mail_subject = "Celery Testing"
-            message = "hello"
+            mail_subject = "Due mail"
+            message = "Your due_date has been crossed. So, return your products today."
             to_email = user.email
 
             send_mail(
@@ -25,28 +25,42 @@ def send_notification_mail(self):
                 recipient_list=[to_email],
                 fail_silently=False,
             )
+            item.email_sent = True
+            item.save()
 
     return "Done"
 
 @shared_task(bind=True)
 def send_warning_mail(self):
-    users = get_user_model().objects.all()
-    warning_date = timezone.now().date() - timedelta(days=2)
+    try:
+        users = get_user_model().objects.all()
 
-    for user in users:
-        purchased_items = PurchasedItem.objects.filter(user=user)
-
-        for item in purchased_items:
-            mail_subject = "Warning mail"
-            message = "Your due date is going to reach on 2 days. So, return your respective products"
-            to_email = user.email
-
-            send_mail(
-                subject=mail_subject,
-                message=message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[to_email],
-                fail_silently=False,
+        for user in users:
+            purchased_items = PurchasedItem.objects.filter(
+                user=user,
+                due_date__date=timezone.now().date() + timedelta(days=2),
             )
 
-    return "Done"
+            for item in purchased_items:
+                warning_date = item.due_date - timedelta(days=2)
+                if timezone.now().date() >= warning_date.date():
+                    mail_subject = "Warning mail"
+                    message = "Your due date is going to reach in 2 days. Please return your respective products."
+                    to_email = user.email
+
+                    send_mail(
+                        subject=mail_subject,
+                        message=message,
+                        from_email=settings.EMAIL_HOST_USER,
+                        recipient_list=[to_email],
+                        fail_silently=True,
+                    )
+                    print(f"Warning mail sent to {to_email}")
+                    
+                    item.email_sent = True
+                    item.save()
+
+        return True
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False

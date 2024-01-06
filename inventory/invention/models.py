@@ -61,6 +61,7 @@ class PurchasedItem(models.Model):
     date_added = models.DateTimeField() 
     status = models.CharField(max_length=20, choices=[('checked_in','checked_in'),('checked_out','checked_out')])
     due_date = models.DateTimeField()
+    email_sent = models.BooleanField(default=False)
     
     def _str_(self):
         return str(self.product)
