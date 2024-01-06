@@ -9,6 +9,11 @@
 </div>
 
 <div class="container my-4" id="productsContainer">
+  <div class="message mt-3">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+  </div>
   <div class="row row-cols-1 row-cols-md-4 g-4" id="productList">
     {% for product in products reversed %}
     <div class="col product-card">
@@ -19,10 +24,10 @@
           <p class="card-text">Available Quantity: {{ product.available_count }}</p>
           <p class="card-text">Category: {{ product.category }}</p>
           <a href="{% url 'Product_description' product.id %}" class="btn btn-outline-primary">View Detail</a>
-          <form action="{% url 'add_to_cart' product_id=product.id %}" method="post" class="mt-3" onsubmit="return validateForm(this, {{ product.available_count }})">
+          <form action="{% url 'add_to_cart' product.id %}" method="post" class="mt-3" onsubmit="return validateForm(this, {{ product.available_count }})" onsubmit="return validateForm(this, {{ product.dummy_count }})">
             {% csrf_token %}
             <div class="input-group">
-              <input type="number" class="form-control" min="0" value="0" name="count">
+              <input type="number" class="form-control" min="0" max="{{ product.available_count }}" value="0" name="count">
               <button class="btn btn-outline-primary" type="button" onclick="increment(this)">+</button>
               <button class="btn btn-outline-primary" type="button" onclick="decrement(this)">-</button>
             </div>
@@ -65,6 +70,18 @@
     if (currentValue > 0) {
       inputField.value = currentValue - 1;
     }
+  }
+
+  function validateForm(form, availableQuantity) {
+    const inputQuantity = parseInt(form.elements['count'].value);
+    if (inputQuantity === 0) {
+      alert('Quantity cannot be zero.');
+      return false; 
+    } else if (inputQuantity > availableQuantity) {
+      alert('Quantity exceeds available quantity.');
+      return false; 
+    }
+    return true;
   }
 
   function validateForm(form, availableQuantity) {

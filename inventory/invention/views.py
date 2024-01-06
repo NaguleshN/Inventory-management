@@ -27,6 +27,10 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, APIView
 from django.db import transaction
+<<<<<<< HEAD
+=======
+from django_ratelimit.decorators import ratelimit
+>>>>>>> 78b228b039a28b87b38c55604cb363a9f856b2b1
 
 
 #rest_api
@@ -67,6 +71,7 @@ def custom_forbidden(request):
 
 
 #Login-And-Register
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @unauthenticated_user
 def login(request):
     if request.user.is_authenticated:
@@ -87,6 +92,7 @@ def login(request):
  
     return render(request,'credential/login.html')
 
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @unauthenticated_user
 def signup(request):
     details=User.objects.all()   
@@ -113,6 +119,7 @@ def signup(request):
 
 
 #Home-Page
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @login_required(login_url= 'login')
 @allowed_user(allowed_roles=['student_user','admin', 'superadmin'])
 def home(request):
@@ -122,6 +129,7 @@ def home(request):
         user.groups.add(admin_group)
 
     products = Product.objects.all()
+<<<<<<< HEAD
     query = request.GET.get('query', '')
     if query:
        products = products.filter(name__icontains = query)
@@ -134,19 +142,33 @@ def home(request):
     
     return render(request, 'core/home.html', {'products': products, 'cart':cart,})
     
+=======
+    print(products)
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'core/home.html', {'products': products, 'count':count,})
+
+>>>>>>> 78b228b039a28b87b38c55604cb363a9f856b2b1
 
 
 #View-Product-Details-As-View-Details
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @login_required(login_url='login')
 def product_description(request, pk):
-    item = Product.objects.get( pk =pk)
-    return render(request, 'core/product_description.html', {'item':item,})
+    item = Product.objects.get(pk =pk)
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'core/product_description.html', {'item':item, 'count':count,})
 
 
 #About-Page
 @login_required(login_url='login')
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 def about(request):
-	return render(request, 'core/about.html')
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    
+    return render(request, 'core/about.html', {'count':count,})
 
 
 #Access-Denied-Page
@@ -157,7 +179,8 @@ def no_permission(request):
 #Cart Functionality
 
 #Add-To-Cart
-temporary_cart = defaultdict(int)
+# temporary_cart = defaultdict(int)
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 def add_to_cart(request, product_id):
     product = Product.objects.select_for_update().get(id=product_id)
     if product.available_count == 0:
@@ -167,72 +190,83 @@ def add_to_cart(request, product_id):
         quantity = request.POST.get("count")
         if quantity is not None: 
             try:
+                # print(quantity)
                 quantity_int = int(quantity)
                 if 0 < quantity_int <= product.available_count and quantity_int <= product.dummy_count:
                     with transaction.atomic():
-                        if quantity_int <= product.dummy_count - temporary_cart[product_id]:
-                            temporary_cart[product_id] += quantity_int
+                        if quantity_int <= product.dummy_count :
+                            a=0
+                            try:
+                                cart=Cart.objects.get(product_name=product,created_by=request.user)
+                                print(cart)
+                                print(cart.quantity)
+                                a=cart.quantity
+                                a += quantity_int
+                                cart.quantity=a
+                                if a > product.dummy_count:
+                                    messages.warning(request, "Not Enough quantity available.")
+                                    return redirect('Home')
+                                cart=Cart.objects.get(product_name=product,created_by=request.user).delete()
+                                Cart.objects.create(product_name=product,quantity=a,created_by=request.user)  
+                            except:
+                                Cart.objects.create(product_name=product,quantity=quantity_int,created_by=request.user)
                         else:
-                            messages.warning(request, "Not Enough quantity available.")
+                            messages.warning(request, "Not Enough quantity available...")
                 else:
                     messages.warning(request, "look up a valid quantity.")
             except ValueError:
                 return HttpResponse("Invalid quantity")
     return redirect('Home')
 
-
 #View-Cart
 def view_cart(request):
-        cart_items = []
-        for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-        cart = len(cart_items)
-        return render(request, 'cart/cart.html', {'cart_items':cart_items,'cart':cart,})
-
+        cart=Cart.objects.filter(created_by=request.user)
+        product=Product.objects.all()
+        category=Category.objects.all()
+        count = cart.count()
+        return render(request, 'cart/cart.html', {'cart_items':cart,'product':product,'category':category, 'count':count,})
 
 #Remove-Cart
 def remove_from_cart(request, product_id):
-    products = Product.objects.get(id = product_id)
-    if product_id in temporary_cart:
-        if temporary_cart[product_id] > 0:
-                products.dummy_count += temporary_cart[product_id]
-                products.save()
-                del temporary_cart[product_id]
+    cart=Cart.objects.get(id=product_id,created_by=request.user).delete()
     return redirect('view_cart')
 
 
+
 #Submit-In-Cart
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 def submit_cart(request):
-  with transaction.atomic():
-    for product_id, quantity in temporary_cart.items():
-        product = Product.objects.select_for_update().get(pk=product_id)
-        if product.available_count >= quantity:
-            product.available_count -= quantity
-            product.save()
-            if request.method == "POST":
-                due_date = request.POST.get('due_date')
-                PurchasedItem.objects.create(product = product,quantity = quantity, user = request.user, date_added = datetime.datetime.now(),due_date = due_date)
-                Log.objects.create(product = product,quantity = quantity, user = request.user, status="checked_in", created_at= datetime.datetime.now(),due_date = due_date)
-    temporary_cart.clear()
+    if request.method == "POST":
+        due_date = request.POST.get('due_date')
+        for i in Cart.objects.filter(created_by=request.user):
+            status='checked_in'
+            p=Product.objects.get(name=i.product_name)
+            if (p.available_count - i.quantity) < 0:
+                Cart.objects.filter(created_by=request.user).delete()
+                messages.warning(request, "Not Enough quantity available..")
+            else:
+                Product.objects.filter(name=i.product_name).update(available_count=F('available_count')-i.quantity)
+                PurchasedItem.objects.create(product=i.product_name, quantity=i.quantity, user=request.user,status=status,date_added=datetime.datetime.now(), due_date=due_date)
+                Log.objects.create(product=i.product_name, quantity=i.quantity, user=request.user, status=status, created_at=datetime.datetime.now(), due_date=due_date)
+                Cart.objects.filter(created_by=request.user).delete()
     return redirect("Home")
 
 
 #Optional-Cart-Quantity
-def decrease_quantity(request, product_id):
-    if product_id in temporary_cart:
-        temporary_cart[product_id] -= 1
-        if temporary_cart[product_id] == 0:
-            del temporary_cart[product_id]
-    return redirect('view_cart')
+# def decrease_quantity(request, product_id):
+#     if product_id in temporary_cart:
+#         temporary_cart[product_id] -= 1
+#         if temporary_cart[product_id] == 0:
+#             del temporary_cart[product_id]
+#     return redirect('view_cart')
 
 
-def increase_quantity(request, product_id):
-    if product_id in temporary_cart:
-        product = Product.objects.get(pk=product_id)
-        if product.available_count > temporary_cart[product_id]:
-            temporary_cart[product_id] += 1
-    return redirect('view_cart')
+# def increase_quantity(request, product_id):
+#     if product_id in temporary_cart:
+#         product = Product.objects.get(pk=product_id)
+#         if product.available_count > temporary_cart[product_id]:
+#             temporary_cart[product_id] += 1
+#     return redirect('view_cart')
 
 
 def update_quantity(request, product_id, quantity):
@@ -248,15 +282,13 @@ def update_quantity(request, product_id, quantity):
 
 #Return-Form-View
 def return_form(request):
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
     purchased_items = Log.objects.filter(user = request.user) 
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    return render(request, 'cart/return_form.html', {'purchased_items':purchased_items, 'cart':cart,})
+    return render(request, 'cart/return_form.html', {'purchased_items':purchased_items, 'count':count,})
 
 #Return-All
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 def return_all(request, item_id):
     item = get_object_or_404(Log, pk=item_id)
     product = item.product
@@ -268,9 +300,7 @@ def return_all(request, item_id):
     product.available_count += item.quantity
     product.dummy_count += item.quantity
     product.save()
-
     item.delete()
-
     return redirect('return_form')
 
 
@@ -280,15 +310,12 @@ class AddReturnView(View):
         categories = Category.objects.all()
         products = Log.objects.all()
         item = get_object_or_404(Log, id=item_id)
-        cart_items = []
-        for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-        cart = len(cart_items)
+        cart=Cart.objects.filter(created_by=request.user)
+        count = cart.count()
         return render(
             request,
             'cart/return.html',
-            {'categories': categories, 'products': products, 'item': item, 'cart':cart,}
+            {'categories': categories, 'products': products, 'item': item, 'count':count}
         )
     
     def post(self, request, item_id):
@@ -316,10 +343,12 @@ class AddReturnView(View):
         else:
             pass
         
+        cart=Cart.objects.filter(created_by=request.user)
+        count = cart.count()
         return render(
             request,
             'cart/return.html',
-            {'categories': categories, 'products': products, 'item': item}
+            {'categories': categories, 'products': products, 'item': item, 'count':count,}
         )
 
 
@@ -330,15 +359,12 @@ class AddWastageView(View):
         categories = Category.objects.all()
         products = Log.objects.all()
         item = get_object_or_404(Log, id=item_id)
-        cart_items = []
-        for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-        cart = len(cart_items)
+        cart=Cart.objects.filter(created_by=request.user)
+        count = cart.count()
         return render(
             request,
             'cart/wastage.html',
-            {'categories': categories, 'products': products, 'item': item,'cart':cart}
+            {'categories': categories, 'products': products, 'item': item, 'count':count,}
         )
 
     def post(self, request, item_id):
@@ -365,11 +391,12 @@ class AddWastageView(View):
             
         else:
             pass
-
+        cart=Cart.objects.filter(created_by=request.user)
+        count = cart.count()
         return render(
             request,
             'cart/wastage.html',
-            {'categories': categories, 'products': products, 'item': item}
+            {'categories': categories, 'products': products, 'item': item, 'count':count,}
         )
         
         
@@ -394,12 +421,9 @@ def users_list(request):
             AdminMail.objects.create(mail=email)
         users = User.objects.all()
         return redirect('users_list')
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins, 'cart':cart,})
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins, 'count':count,})
 
 
 #Super-Admin-Remove-The-Admin-Role
@@ -430,28 +454,24 @@ def admin_view(request):
     log = Log.objects.all()
     purchased_items = PurchasedItem.objects.all()
     checked_out = CheckedOutLog.objects.all()
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    return render(request, 'adminview/admin.html', {'log':log, 'checked_out':checked_out, 'purchased_items': purchased_items,'cart':cart,})
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'adminview/admin.html', {'log':log, 'checked_out':checked_out, 'purchased_items': purchased_items,'count':count,})
 
 
 #Wastage-Record-View-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=(['admin', 'superadmin']))
 @login_required(login_url='login')
 def wastage(request):
     wastage = Wastage.objects.all()
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    return render(request, 'adminview/wastage_render.html', {'wastage': wastage, 'cart':cart,})
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'adminview/wastage_render.html', {'wastage': wastage, 'count':count,})
 
 
 #Add-Product-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=(['admin', 'superadmin']))
 @login_required(login_url='login')
 def add_product(request):
@@ -473,28 +493,23 @@ def add_product(request):
          else:
              sweetify.warning(request, 'Product added successfully',button="OK")
              return redirect("Add_product")
-   cart_items = []
-   for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-   cart = len(cart_items)   
-    
-   return render (request,"adminview/add_product.html",{"category":category, "products":products, 'cart':cart,})
+   cart=Cart.objects.filter(created_by=request.user)
+   count = cart.count()
+   return render (request,"adminview/add_product.html",{"category":category, "products":products,'count':count,})
 
 #View-Product-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def view_product(request):
     products = Product.objects.all()
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    return render(request, 'adminview/product.html', {'products':products, 'cart':cart,})
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'adminview/product.html', {'products':products, 'count':count,})
 
 
 #Remove-Product-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def remove_product(request, pk):
@@ -504,6 +519,7 @@ def remove_product(request, pk):
 
 
 #Add-Category-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def add_category(request):
@@ -512,29 +528,24 @@ def add_category(request):
     if request.method == "POST":
          name = request.POST.get('name')
          Category.objects.create(name = name, created_by = request.user)
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-         
-    return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories),'cart':cart})
+     cart=Cart.objects.filter(created_by=request.user)
+     count = cart.count()
+     return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories), 'count':count,})
 
 
 #View-Category-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def category(request):
         categories = Category.objects.all()
-        cart_items = []
-        for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-        cart = len(cart_items)
-        return render(request, 'adminview/editCategory.html', {'categories': categories,'cart':cart})
+        cart=Cart.objects.filter(created_by=request.user)
+        count = cart.count()
+        return render(request, 'adminview/editCategory.html', {'categories': categories, 'count':count,})
 
 
 #Remove-Category-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def remove_category(request, category_id):
@@ -544,6 +555,7 @@ def remove_category(request, category_id):
 
 
 #Edit-Category-For-Admin-SuperAdmin
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def edit_category(request, category_id):
@@ -555,11 +567,8 @@ def edit_category(request, category_id):
             category.name = new_category_name
             category.save()
             return redirect('Add_category')
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    return render(request, 'adminview/edit_category.html', {"category":category,'cart':cart})
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'adminview/edit_category.html', {"category":category, 'count':count,})
 
 

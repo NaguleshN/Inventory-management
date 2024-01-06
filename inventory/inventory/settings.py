@@ -22,9 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+IS_PRODUCTION = config('IS_PRODUCTION')
+
+DEBUG = IS_PRODUCTION
+# DEBUG = True
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
@@ -48,12 +51,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'django_celery_results',
     'django_celery_beat',
-
+    
     #Rest_framework
     'rest_framework',
-    
     #own
     'invention',
     'sweetify',
@@ -192,23 +195,30 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = 'redis://redis:6379/0' if IS_PRODUCTION else 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 # CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
 CELERY_RESULT_BACKEND = 'django-db'
+broker_connection_retry_on_startup = True
 
 # celery beat 
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'invention/static'),]
 
-MEDIA_URL = 'media/'
+STATIC_ROOT = 'static/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
+
+CSRF_TRUSTED_ORIGINS = ["http://10.1.75.42",]
+

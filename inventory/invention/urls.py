@@ -16,8 +16,7 @@ urlpatterns = [
     #Home-Page-And-navbar-page-For-Users
     path('', views.home ,name="Home"), 
     path('about/', views.about , name="About"),
-    path('product_description/<int:pk>', views.product_description, name="Product_description"),
-
+    path('product_description/<int:pk>/', views.product_description, name="Product_description"),
 
     #Admin-and-superadmin
     path('admin_views/', views.admin_view, name='admin_views'),
@@ -47,9 +46,9 @@ urlpatterns = [
     path('add/<int:product_id>/', views.add_to_cart, name="add_to_cart"),
     path('remove_from_cart/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/submit/', views.submit_cart, name='submit_cart'),
-    path('increase_quantity/<int:product_id>/', views.increase_quantity, name='increase_quantity'),
-    path('decrease_quantity/<int:product_id>/', views.decrease_quantity, name='decrease_quantity'),
-    path('update_quantity/<int:product_id>/<int:quantity>/', views.update_quantity, name='update_quantity'),
+    # path('increase_quantity/<int:product_id>/', views.increase_quantity, name='increase_quantity'),
+    # path('decrease_quantity/<int:product_id>/', views.decrease_quantity, name='decrease_quantity'),
+    # path('update_quantity/<int:product_id>/<int:quantity>/', views.update_quantity, name='update_quantity'),
 
     #Return-form
     path('return_form/', views.return_form, name="return_form"),

@@ -70,7 +70,6 @@
                   </div>
                   <div class="mb-3">
                     <label for="img" class="form-label">Image</label>
-                    <!-- <input type="file" class="form-control" id="img"  name="image" accept=".png, .jpg, .jpeg" required> -->
                     <input name="image" class="form-control" type="file" id="fileName" accept=".jpg,.jpeg,.png" onchange="validateFileType()"/>
                   </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -123,10 +122,12 @@
             //TO DO
         }else{
             alert("Only jpg/jpeg and png files are allowed!");
+            return;
         }   
     }
 
   </script>
+
 </body>
 
 {% endblock %}
