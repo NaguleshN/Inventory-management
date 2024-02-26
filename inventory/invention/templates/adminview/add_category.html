@@ -76,7 +76,7 @@
 
     <div class="container mb-4 mt-2" id="productsContainer">
         <div class="row row-cols-1 row-cols-md-4 g-4" id="productList">
-          {% for category in categories %}
+          {% for category in categories reversed %}
           <div class="col product-card">
             <div class="card shadow">
               <div class="card-body">
@@ -85,6 +85,8 @@
                 </div>
               </div>
             </div>
+            {% empty %}
+            <p>Not yet added</p>
           {% endfor %}
           </div>
       

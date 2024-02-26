@@ -24,10 +24,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 
-IS_PRODUCTION = config('IS_PRODUCTION')
+# IS_PRODUCTION = config('IS_PRODUCTION')
 
-DEBUG = IS_PRODUCTION
-# DEBUG = True
+# DEBUG = not IS_PRODUCTION
+DEBUG = True
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
@@ -195,7 +195,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://redis:6379/0' if IS_PRODUCTION else 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = 'redis://localhost:6379/0' 
+# if IS_PRODUCTION else 'redis://127.0.0.1:6379'
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'

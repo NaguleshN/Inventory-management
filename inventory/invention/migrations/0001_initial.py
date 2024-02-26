@@ -45,7 +45,12 @@ class Migration(migrations.Migration):
                 ('dummy_count', models.PositiveIntegerField()),
                 ('created_at', models.DateTimeField(auto_now=True)),
                 ('image', models.ImageField(upload_to='images')),
+                ('actual_price', models.PositiveIntegerField()),
+                ('available_price', models.PositiveIntegerField()),
+                ('unit_price', models.FloatField()),
+                ('is_active', models.BooleanField(default=False)),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='invention.category')),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -61,6 +66,30 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='SubCategory',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name_sub', models.CharField(max_length=25)),
+                ('created_at', models.DateTimeField(auto_now=True)),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='invention.category')),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Stock',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=255)),
+                ('actual_stock', models.PositiveIntegerField()),
+                ('available_stock', models.PositiveIntegerField()),
+                ('actual_price', models.FloatField()),
+                ('available_price', models.FloatField()),
+                ('unit_price', models.FloatField()),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('sub_category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='invention.subcategory')),
+            ],
+        ),
+        migrations.CreateModel(
             name='PurchasedItem',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -72,6 +101,11 @@ class Migration(migrations.Migration):
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='invention.product')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
+        ),
+        migrations.AddField(
+            model_name='product',
+            name='sub_category',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='invention.subcategory'),
         ),
         migrations.CreateModel(
             name='Log',

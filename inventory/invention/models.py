@@ -12,9 +12,14 @@ class Product(models.Model):
     available_count=models.PositiveIntegerField()
     dummy_count = models.PositiveIntegerField()
     category= models.ForeignKey('Category', on_delete=models.CASCADE)
+    sub_category = models.ForeignKey('SubCategory', on_delete = models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='images')
-
+    actual_price = models.PositiveIntegerField()
+    available_price = models.PositiveIntegerField()
+    unit_price = models.FloatField()
+    is_active = models.BooleanField(default = False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.name)
@@ -30,6 +35,15 @@ class Category(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+class SubCategory(models.Model):
+    name_sub=models.CharField(max_length=25)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at=models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+      return self.name_sub
     
 temporary_cart = {} 
 
@@ -90,3 +104,17 @@ class CheckedOutLog(models.Model):
 
 class AdminMail(models.Model):
     mail=models.CharField(max_length=50)
+
+
+class Stock(models.Model):
+    name = models.CharField(max_length=255) 
+    actual_stock = models.PositiveIntegerField() 
+    available_stock = models.PositiveIntegerField()
+    actual_price = models.FloatField() 
+    available_price = models.FloatField()
+    unit_price = models.FloatField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    sub_category = models.ForeignKey('SubCategory', on_delete=models.CASCADE)
+
+    def __str__(self):
+      return self.name

@@ -27,10 +27,8 @@ from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, APIView
 from django.db import transaction
-<<<<<<< HEAD
-=======
 from django_ratelimit.decorators import ratelimit
->>>>>>> 78b228b039a28b87b38c55604cb363a9f856b2b1
+
 
 
 #rest_api
@@ -54,7 +52,7 @@ def form_valid(self, form):
 #Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
     email=AdminMail.objects.all()
-    allowed_emails = ['nagulesh.22cs@kct.ac.in']
+    allowed_emails = ['nagulesh.22cs@kct.ac.in',]
     for e in email:
         allowed_emails.append(e.mail)
         
@@ -121,35 +119,24 @@ def signup(request):
 #Home-Page
 @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @login_required(login_url= 'login')
-@allowed_user(allowed_roles=['student_user','admin', 'superadmin'])
 def home(request):
     if len(request.user.username)>9:
         user = get_object_or_404(User, id=request.user.id)
-        admin_group = Group.objects.get(name='admin') 
+        admin_group = Group.objects.get(name='student_user')
         user.groups.add(admin_group)
 
     products = Product.objects.all()
-<<<<<<< HEAD
     query = request.GET.get('query', '')
     if query:
        products = products.filter(name__icontains = query)
     
-    cart_items = []
-    for product_id, quantity in temporary_cart.items():
-            product = Product.objects.get(pk=product_id)
-            cart_items.append({'product': product, 'quantity': quantity})
-    cart = len(cart_items)
-    
-    return render(request, 'core/home.html', {'products': products, 'cart':cart,})
-    
-=======
-    print(products)
     cart=Cart.objects.filter(created_by=request.user)
     count = cart.count()
+    
     return render(request, 'core/home.html', {'products': products, 'count':count,})
+    
 
 >>>>>>> 78b228b039a28b87b38c55604cb363a9f856b2b1
-
 
 #View-Product-Details-As-View-Details
 @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
@@ -228,7 +215,8 @@ def view_cart(request):
 
 #Remove-Cart
 def remove_from_cart(request, product_id):
-    cart=Cart.objects.get(id=product_id,created_by=request.user).delete()
+    cart=Cart.objects.get(id=product_id,created_by=request.user)
+    cart.delete()
     return redirect('view_cart')
 
 
@@ -251,22 +239,6 @@ def submit_cart(request):
                 Cart.objects.filter(created_by=request.user).delete()
     return redirect("Home")
 
-
-#Optional-Cart-Quantity
-# def decrease_quantity(request, product_id):
-#     if product_id in temporary_cart:
-#         temporary_cart[product_id] -= 1
-#         if temporary_cart[product_id] == 0:
-#             del temporary_cart[product_id]
-#     return redirect('view_cart')
-
-
-# def increase_quantity(request, product_id):
-#     if product_id in temporary_cart:
-#         product = Product.objects.get(pk=product_id)
-#         if product.available_count > temporary_cart[product_id]:
-#             temporary_cart[product_id] += 1
-#     return redirect('view_cart')
 
 
 def update_quantity(request, product_id, quantity):
@@ -357,9 +329,11 @@ class AddReturnView(View):
 class AddWastageView(View):
     def get(self, request, item_id):
         categories = Category.objects.all()
+       
         products = Log.objects.all()
         item = get_object_or_404(Log, id=item_id)
         cart=Cart.objects.filter(created_by=request.user)
+        print(item.product.name)
         count = cart.count()
         return render(
             request,
@@ -371,22 +345,24 @@ class AddWastageView(View):
         categories = Category.objects.all()
         products = Log.objects.all()
         item = get_object_or_404(Log, id=item_id)
-
+        products = Product.objects.all()
         damaged_quantity = request.POST.get("damaged_qty")
         reason = request.POST.get("reason")
 
         if damaged_quantity is not None and damaged_quantity.isdigit() and int(damaged_quantity) <= item.quantity and int(damaged_quantity) > 0:
             damaged_quantity = int(damaged_quantity)
             item.quantity -= damaged_quantity
-
-        
             item.save()
-
             Wastage.objects.create(user=request.user,product_name=item.product,quantity=damaged_quantity,reason=reason,category=item.product.category)
+            for product in products:
+              if item.product.name == product.name:
+                s = damaged_quantity * product.unit_price
+                product.available_price = product.available_price - s
+                product.save()
             if item.quantity == 0:
                 item.delete()
                 return redirect('return_form')
-        
+
             return redirect('return_form')
             
         else:
@@ -399,7 +375,6 @@ class AddWastageView(View):
             {'categories': categories, 'products': products, 'item': item, 'count':count,}
         )
         
-        
 #User-Groups
 
 #Super-Admin-Only-view
@@ -407,23 +382,35 @@ class AddWastageView(View):
 @allowed_user(allowed_roles=['superadmin'])
 def users_list(request):
     users = User.objects.all()
-    admins=AdminMail.objects.all()
-    pattern= r"^[a-zA-Z0-9_.]+@(kct\.)+(ac\.)+in$"
-    if request.method=="POST":
-        email=request.POST.get("email")
-        print(email)
-        if re.match(pattern,email):
-            print("valid")
+    admins = AdminMail.objects.all()
+    pattern = r"^[a-zA-Z0-9_.]+@(kct\.)+(ac\.)+in$"
+    if request.method == "POST":
+        email = request.POST.get("email")
+        if re.match(pattern, email):
             for i in admins:
-                if email==i.mail:
+                if email == i.mail:
                     sweetify.warning(request, 'Microsoft mail-id already exists ',button="OK")
-                    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins})
+                    return render(request, 'superadmin_view/users.html', {'users': users, 'admins': admins})
+            
+            admin_group = Group.objects.get(name='admin')
+            
+            user = User.objects.get(email=email)
+            
+            student_user_group = Group.objects.get(name='student_user')
+            
+            user.groups.remove(student_user_group)
+            
+            user.groups.add(admin_group)
+
             AdminMail.objects.create(mail=email)
+
         users = User.objects.all()
         return redirect('users_list')
-    cart=Cart.objects.filter(created_by=request.user)
+
+    cart = Cart.objects.filter(created_by=request.user)
     count = cart.count()
-    return render(request, 'superadmin_view/users.html', {'users': users,'admins':admins, 'count':count,})
+    return render(request, 'superadmin_view/users.html', {'users': users, 'admins': admins, 'count': count})
+
 
 
 #Super-Admin-Remove-The-Admin-Role
@@ -432,20 +419,6 @@ def remove_role(request, user_id):
     emails=AdminMail.objects.all()
     AdminMail.objects.filter(id=user_id).delete()
     return redirect('users_list')
-
-
-#Super-Admin-Apoint-Admin
-# @allowed_user(allowed_roles=['superadmin'])
-# def appoint_admin(request, user_id):
-#     if request.method == 'POST':
-#         user = get_object_or_404(User, id=user_id)
-#         admin_group = Group.objects.get(name='admin') 
-#         user.groups.add(admin_group)
-#         return redirect('users_list')
-#     else:
-#         pass
-#     return redirect(request, 'super_admin/users.html', {'user':user, } )
-
 
 #Log-For-Admin-SuperAdmin
 @login_required(login_url='login')
@@ -477,6 +450,7 @@ def wastage(request):
 def add_product(request):
    category=Category.objects.all()
    products = Product.objects.all()
+   sub_category = SubCategory.objects.all()
    if request.method=="POST" and request.FILES.get('image'):
          product_name=request.POST.get("name")
          decription=request.POST.get("description")
@@ -485,9 +459,15 @@ def add_product(request):
          img=request.FILES["image"]   
          cat=request.POST.get("category")
          category=Category.objects.get(name=cat)
+         sub = request.POST.get('sub_category')
+         sub_category = SubCategory.objects.get(name_sub=sub) 
+         unit_price = request.POST.get('unit_price')
+
+         a_price = int(unit_price) * int(available_count)
+         ac_price = int(unit_price) * int(actual_count)
          if int(actual_count) >= int(available_count):
             print("exec add product")
-            Product.objects.create(name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img, dummy_count = available_count)
+            Product.objects.create(created_by=request.user,name=product_name,decription=decription,actual_count=actual_count,available_count=available_count,category=category,image=img, dummy_count = available_count,sub_category = sub_category, unit_price = unit_price, actual_price=ac_price , available_price = a_price )
             sweetify.success(request, 'Look Up the Available Quantity',button="OK")
             return redirect("Add_product")
          else:
@@ -495,11 +475,11 @@ def add_product(request):
              return redirect("Add_product")
    cart=Cart.objects.filter(created_by=request.user)
    count = cart.count()
-   return render (request,"adminview/add_product.html",{"category":category, "products":products,'count':count,})
+   return render (request,"adminview/add_product.html",{"category":category, "products":products,'count':count, 'sub_category':sub_category,})
 
 #View-Product-For-Admin-SuperAdmin
 @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
-@allowed_user(allowed_roles=['admin', 'superadmin'])
+@allowed_user(allowed_roles=(['admin', 'superadmin']))
 @login_required(login_url='login')
 def view_product(request):
     products = Product.objects.all()
@@ -510,7 +490,7 @@ def view_product(request):
 
 #Remove-Product-For-Admin-SuperAdmin
 @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
-@allowed_user(allowed_roles=['admin', 'superadmin'])
+@allowed_user(allowed_roles=(['admin', 'superadmin']))
 @login_required(login_url='login')
 def remove_product(request, pk):
     product = Product.objects.get(pk = pk)
@@ -519,7 +499,7 @@ def remove_product(request, pk):
 
 
 #Add-Category-For-Admin-SuperAdmin
-@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
+# @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def add_category(request):
@@ -528,13 +508,16 @@ def add_category(request):
     if request.method == "POST":
          name = request.POST.get('name')
          Category.objects.create(name = name, created_by = request.user)
-     cart=Cart.objects.filter(created_by=request.user)
-     count = cart.count()
-     return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories), 'count':count,})
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()     
+    return render(request, 'adminview/add_category.html', {'categories': categories,'existing_categories': list(existing_categories), 'count':count,})     
+
+
+
 
 
 #View-Category-For-Admin-SuperAdmin
-@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
+# @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
 @allowed_user(allowed_roles=['admin', 'superadmin'])
 @login_required(login_url='login')
 def category(request):
@@ -570,5 +553,104 @@ def edit_category(request, category_id):
     cart=Cart.objects.filter(created_by=request.user)
     count = cart.count()
     return render(request, 'adminview/edit_category.html', {"category":category, 'count':count,})
+
+def add_subcategory(request):
+  sub_category = SubCategory.objects.all()
+  categories = Category.objects.all()
+  existing_categories = SubCategory.objects.values_list('name_sub', flat=True)
+  if request.method == "POST":
+      name = request.POST.get('name')
+      cat=request.POST.get("category")
+      category=Category.objects.get(name=cat)
+      SubCategory.objects.create(name_sub = name, created_by = request.user,category=category)
+  return render(request, 'adminview/add_subcategory.html', {'sub_category': sub_category, 'existing_categories': list(existing_categories), 'categories':categories,})  
+
+
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def sub_category(request):
+        categories = SubCategory.objects.all()
+        cart=Cart.objects.filter(created_by=request.user)
+        count = cart.count()
+        return render(request, 'adminview/edit_subCategory.html', {'categories': categories, 'count':count,})  
+
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def remove_subcategory(request, subcategory_id):
+    category = SubCategory.objects.get(id = subcategory_id)
+    category.delete()
+    return redirect('Add_subcategory')  
+
+
+@ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)
+@allowed_user(allowed_roles=['admin', 'superadmin'])
+@login_required(login_url='login')
+def edit_subcategory(request, subcategory_id):
+    category = SubCategory.objects.get(id = subcategory_id)
+    print(subcategory_id)
+    if request.method == "POST":
+       new_category_name = request.POST.get('new_category_name')
+       print(new_category_name)
+
+       if new_category_name:
+            category.name_sub = new_category_name
+            category.save()
+            return redirect('Add_subcategory')
+    cart=Cart.objects.filter(created_by=request.user)
+    count = cart.count()
+    return render(request, 'adminview/edit_sub_category.html', {"category":category, 'count':count,})      
+
+def edit_product_view(request, product_id):     
+    product = Product.objects.get(id = product_id)
+    if request.method=="POST":
+         product_name=request.POST.get("name")
+         decription=request.POST.get("description") 
+         unit_price = request.POST.get('unit_price')
+         curr_qty = request.POST.get('curr_qty')
+         c_qty = int(curr_qty)
+         a_stock = c_qty + product.available_count
+         actual_stock = c_qty + product.actual_count
+
+         a_price = float(unit_price) * float(a_stock) 
+         ac_price = float(unit_price) * float(actual_stock)
+         print(c_qty)
+         print(a_stock)
+
+         par_unit_price = request.POST.get('par_curr_price') 
+         par_price = int(par_unit_price) * c_qty
+
+         actual_price = par_price + product.actual_price
+         available_price = par_price + product.available_price
+
+
+
+         if int(par_unit_price) != 0:
+          if(a_stock <= product.actual_count):
+                product.name = product_name
+                product.decription = decription
+                product.unit_price = unit_price
+                product.available_count = a_stock
+                product.available_price = a_price
+                product.actual_count = actual_stock
+                product.actual_price = ac_price
+                product.save()
+                return redirect('product')
+              
+         else: 
+            if(a_stock <= product.actual_count):
+                product.name = product_name
+                product.decription = decription
+                product.unit_price = unit_price
+                product.available_count = a_stock
+                product.available_price = available_price
+                product.actual_price = actual_price
+                product.actual_count = actual_stock
+                product.save()
+                return redirect('product') 
+
+    return render(request, 'adminview/edit_product.html', {'product':product})
+
+
 
 
