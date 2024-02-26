@@ -52,7 +52,7 @@ def form_valid(self, form):
 #Microsoft-Authentication-View-Only-For-Admin
 def restrict_user_pipeline(strategy, details, user=None, is_new=False, *args, **kwargs):
     email=AdminMail.objects.all()
-    allowed_emails = ['nagulesh.22cs@kct.ac.in',]
+    allowed_emails = ['nagulesh.22cs@kct.ac.in']
     for e in email:
         allowed_emails.append(e.mail)
         
@@ -136,7 +136,7 @@ def home(request):
     return render(request, 'core/home.html', {'products': products, 'count':count,})
     
 
->>>>>>> 78b228b039a28b87b38c55604cb363a9f856b2b1
+
 
 #View-Product-Details-As-View-Details
 @ratelimit(key='ip', rate='10/m', method=ratelimit.ALL, block=True)

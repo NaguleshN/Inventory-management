@@ -5,6 +5,17 @@ from django.utils import timezone
 import datetime
 # from datetime.timezone import tz
 
+class Signup(models.Model):
+  username = models.CharField(max_length=100)
+  password = models.CharField(max_length=100)
+  con_password = models.CharField(max_length=100)
+
+
+class login(models.Model):
+  username = models.CharField(max_length=100)
+  password = models.CharField(max_length=100)
+
+
 class Product(models.Model):
     name=models.CharField(max_length=255)
     decription=models.CharField(max_length=100)
